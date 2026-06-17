@@ -446,14 +446,7 @@ useEffect(()=>{
           <button onClick={()=>exportExcel(data)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>
             📊 Excel
           </button>
-          <button onClick={()=>exportWord(data,setWordStatus)} disabled={wordStatus==="generating"} style={{
-            padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",
-            background:wordStatus==="done"?"rgba(22,101,52,0.35)":wordStatus==="error"?"rgba(153,27,27,0.35)":"rgba(255,255,255,0.12)",
-            color:C.white,cursor:wordStatus==="generating"?"wait":"pointer",fontSize:12,fontWeight:600
-          }}>
-            {wordStatus==="generating"?"⏳ Word...":wordStatus==="done"?"✓ Word":wordStatus==="error"?"✕ خطأ":"📄 Word"}
-          </button>
-        </div>
+                 </div>
       </div>
 
       {/* Overall + save indicator */}
