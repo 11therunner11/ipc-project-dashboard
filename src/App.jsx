@@ -73,6 +73,52 @@ function calcProgress(tasks) {
   return Math.round((done/total)*100);
 }
 
+function getTodayTasks(data){
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  return data.flatMap(p =>
+    p.tasks
+      .filter(t => {
+
+        if(!t.due || t.status==="Done") return false;
+
+        const dueDate = new Date(t.due);
+        dueDate.setHours(0,0,0,0);
+
+        return dueDate.getTime() === today.getTime();
+      })
+      .map(t => ({
+        title: t.title,
+        pillar: p.titleAr
+      }))
+  );
+}
+
+function getOverdueTasks(data){
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  return data.flatMap(p =>
+    p.tasks
+      .filter(t => {
+
+        if(!t.due || t.status==="Done") return false;
+
+        const dueDate = new Date(t.due);
+        dueDate.setHours(0,0,0,0);
+
+        return dueDate < today;
+      })
+      .map(t => ({
+        title: t.title,
+        pillar: p.titleAr
+      }))
+  );
+}
+
 function calcOverall(data) {
   const totalW = data.reduce((s,p)=>s+p.weight,0);
   const contrib = data.reduce((s,p)=>s+(calcProgress(p.tasks)/100)*p.weight,0);
@@ -306,6 +352,14 @@ export default function App() {
   });
 
   const [view, setView]             = useState("dashboard");
+const [showAddPillar,setShowAddPillar] = useState(false);
+
+const [newPillar,setNewPillar] = useState({
+  titleAr:"",
+  title:"",
+  owner:"",
+  weight:10
+});
   const [addingTask, setAddingTask] = useState(null);
   const [newTask, setNewTask]       = useState({title:"",weight:10,status:"Open",owner:"",due:"TBD"});
   const [editingTask, setEditTask]  = useState(null);
@@ -396,6 +450,28 @@ useEffect(()=>{
     setData(d=>d.map(p=>p.id!==pillarId?p:{...p,tasks:p.tasks.filter(t=>t.id!==taskId)}));
     if(editingTask?.taskId===taskId) setEditTask(null);
   }
+function addPillar(){
+
+  const pillar = {
+    id: Date.now().toString(),
+    titleAr: newPillar.titleAr,
+    title: newPillar.title,
+    owner: newPillar.owner,
+    weight: Number(newPillar.weight),
+    tasks:[]
+  };
+
+  setData(d=>[...d,pillar]);
+
+  setNewPillar({
+    titleAr:"",
+    title:"",
+    owner:"",
+    weight:10
+  });
+
+  setShowAddPillar(false);
+}
   function addTask(pillarId){
     if(!newTask.title.trim()) return;
     setData(d=>d.map(p=>p.id!==pillarId?p:{...p,tasks:[...p.tasks,{...newTask,id:`${pillarId}-${Date.now()}`,weight:Number(newTask.weight)}]}));
@@ -428,8 +504,18 @@ useEffect(()=>{
         <div style={{display:"flex",gap:6,marginBottom:6}}>
           <input value={task.owner} onChange={e=>updateTask(pillar.id,task.id,"owner",e.target.value)}
             placeholder="المسؤول" style={{flex:2,padding:"6px 8px",border:`1px solid ${C.grayLight}`,borderRadius:6,fontSize:12}}/>
-          <input value={task.due} onChange={e=>updateTask(pillar.id,task.id,"due",e.target.value)}
-            placeholder="الموعد" style={{flex:1,padding:"6px 8px",border:`1px solid ${C.grayLight}`,borderRadius:6,fontSize:12}}/>
+          <input
+  type="date"
+  value={task.due || ""}
+  onChange={e=>updateTask(pillar.id,task.id,"due",e.target.value)}
+  style={{
+    flex:1,
+    padding:"6px 8px",
+    border:`1px solid ${C.grayLight}`,
+    borderRadius:6,
+    fontSize:12
+  }}
+/>
         </div>
         <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:8}}>
           <span style={{fontSize:12,color:C.gray,whiteSpace:"nowrap"}}>الوزن %</span>
@@ -468,6 +554,8 @@ useEffect(()=>{
       </div>
     );
   }
+const todayTasks = getTodayTasks(data);
+const overdueTasks = getOverdueTasks(data);
 
   const saveLabel=saveStatus==="saving"?"⏳ جاري الحفظ...":saveStatus==="saved"?"✓ محفوظ":"⚠ خطأ في الحفظ";
   const saveColor=saveStatus==="saved"?C.done:saveStatus==="saving"?C.progress:C.red;
@@ -526,6 +614,49 @@ useEffect(()=>{
 </button>
                  </div>
       </div>
+{(todayTasks.length>0 || overdueTasks.length>0) && (
+<div style={{
+  background:"#fff",
+  border:"1px solid #ddd",
+  borderRadius:8,
+  padding:"10px",
+  margin:"10px 18px"
+}}>
+
+  <div style={{fontWeight:700,marginBottom:8}}>
+    التنبيهات
+  </div>
+
+  {overdueTasks.length>0 && (
+    <div style={{marginBottom:10}}>
+      <div style={{color:"#c62828",fontWeight:700}}>
+        🔴 مهام متأخرة: {overdueTasks.length}
+      </div>
+
+      {overdueTasks.map((t,i)=>(
+        <div key={i}>
+          • {t.title}
+        </div>
+      ))}
+    </div>
+  )}
+
+  {todayTasks.length>0 && (
+    <div>
+      <div style={{color:"#ef6c00",fontWeight:700}}>
+        🟡 مهام اليوم: {todayTasks.length}
+      </div>
+
+      {todayTasks.map((t,i)=>(
+        <div key={i}>
+          • {t.title}
+        </div>
+      ))}
+    </div>
+  )}
+
+</div>
+)}
 
       {/* Overall + save indicator */}
       <div style={{background:C.navy,padding:"10px 18px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
@@ -536,6 +667,91 @@ useEffect(()=>{
         <span style={{fontSize:11,fontWeight:600,color:saveColor,background:"rgba(255,255,255,0.08)",padding:"3px 9px",borderRadius:5,whiteSpace:"nowrap"}}>{saveLabel}</span>
         <button onClick={resetData} title="إعادة تعيين البيانات" style={{padding:"3px 8px",borderRadius:5,border:"1px solid rgba(255,120,120,0.4)",background:"transparent",color:"rgba(255,160,160,0.9)",cursor:"pointer",fontSize:11}}>↺</button>
       </div>
+
+{showAddPillar && (
+  <div style={{
+    position:"fixed",
+    inset:0,
+    background:"rgba(0,0,0,0.5)",
+    zIndex:300,
+    display:"flex",
+    alignItems:"center",
+    justifyContent:"center"
+  }}>
+
+    <div style={{
+      background:"#fff",
+      padding:20,
+      borderRadius:10,
+      width:420,
+      maxWidth:"95%"
+    }}>
+
+      <h3 style={{marginTop:0}}>إضافة مهمة رئيسية</h3>
+
+      <input
+        placeholder="الاسم العربي"
+        value={newPillar.titleAr}
+        onChange={e=>setNewPillar(p=>({...p,titleAr:e.target.value}))}
+        style={{width:"100%",padding:8,marginBottom:8}}
+      />
+
+      <input
+        placeholder="الاسم الإنجليزي"
+        value={newPillar.title}
+        onChange={e=>setNewPillar(p=>({...p,title:e.target.value}))}
+        style={{width:"100%",padding:8,marginBottom:8}}
+      />
+
+      <input
+        placeholder="المسؤول"
+        value={newPillar.owner}
+        onChange={e=>setNewPillar(p=>({...p,owner:e.target.value}))}
+        style={{width:"100%",padding:8,marginBottom:8}}
+      />
+
+      <input
+        type="number"
+        placeholder="الوزن"
+        value={newPillar.weight}
+        onChange={e=>setNewPillar(p=>({...p,weight:e.target.value}))}
+        style={{width:"100%",padding:8,marginBottom:12}}
+      />
+
+      <div style={{display:"flex",gap:8}}>
+
+        <button
+          onClick={addPillar}
+          style={{
+            flex:1,
+            padding:"10px",
+            background:"#0b5ed7",
+            color:"#fff",
+            border:"none",
+            borderRadius:6
+          }}
+        >
+          حفظ
+        </button>
+
+        <button
+          onClick={()=>setShowAddPillar(false)}
+          style={{
+            flex:1,
+            padding:"10px",
+            border:"1px solid #ccc",
+            borderRadius:6
+          }}
+        >
+          إلغاء
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
       {/* Weights modal */}
       {editingWeights&&(
@@ -569,10 +785,33 @@ useEffect(()=>{
 
         {/* ══ DASHBOARD ════════════════════════════════════════════════════ */}
         {view==="dashboard"&&(
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(360px,1fr))",gap:14}}>
-            {data.map(pillar=>{
-              const prog=calcProgress(pillar.tasks);
-              return(
+<>
+  <div style={{marginBottom:12}}>
+    <button
+      onClick={()=>setShowAddPillar(true)}
+      style={{
+        padding:"8px 14px",
+        borderRadius:6,
+        border:"none",
+        background:C.blue,
+        color:C.white,
+        cursor:"pointer",
+        fontWeight:700
+      }}
+    >
+      ➕ إضافة مهمة رئيسية
+    </button>
+  </div>
+
+  <div style={{
+    display:"grid",
+    gridTemplateColumns:"repeat(auto-fill,minmax(360px,1fr))",
+    gap:14
+  }}>
+
+    {data.map(pillar=>{
+      const prog=calcProgress(pillar.tasks);
+      return(
                 <div key={pillar.id} style={{background:C.white,borderRadius:10,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",border:`1px solid ${C.grayLight}`}}>
                   <div style={{background:C.blue,padding:"11px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <div>
@@ -598,8 +837,17 @@ useEffect(()=>{
                         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:6}}>
                           <input placeholder="المسؤول" value={newTask.owner} onChange={e=>setNewTask(n=>({...n,owner:e.target.value}))}
                             style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
-                          <input placeholder="الموعد" value={newTask.due} onChange={e=>setNewTask(n=>({...n,due:e.target.value}))}
-                            style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
+                          <input
+  type="date"
+  value={newTask.due || ""}
+  onChange={e=>setNewTask(n=>({...n,due:e.target.value}))}
+  style={{
+    padding:"5px 6px",
+    borderRadius:5,
+    border:`1px solid ${C.grayLight}`,
+    fontSize:11
+  }}
+/>
                         </div>
                         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                           <label style={{fontSize:11,color:C.gray,whiteSpace:"nowrap"}}>الوزن %</label>
@@ -629,7 +877,8 @@ useEffect(()=>{
               );
             })}
           </div>
-        )}
+</>
+)}
 
         {/* ══ KANBAN ═══════════════════════════════════════════════════════ */}
         {view==="board"&&(
