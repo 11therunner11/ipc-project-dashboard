@@ -156,6 +156,25 @@ function exportExcel(data) {
   XLSX.writeFile(wb,`IPC_WBS_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
+function backupData(data){
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `IPC_Backup_${new Date().toISOString().slice(0,10)}.json`;
+
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // ── Export Word (HTML→.doc) ───────────────────────────────────────────────────
 async function exportWord(data, setWordStatus) {
   setWordStatus("generating");
@@ -446,6 +465,22 @@ useEffect(()=>{
           <button onClick={()=>exportExcel(data)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>
             📊 Excel
           </button>
+
+<button
+  onClick={()=>backupData(data)}
+  style={{
+    padding:"5px 12px",
+    borderRadius:6,
+    border:"1px solid rgba(255,255,255,0.35)",
+    background:"rgba(255,255,255,0.12)",
+    color:C.white,
+    cursor:"pointer",
+    fontSize:12,
+    fontWeight:600
+  }}
+>
+  💾 Backup
+</button>
                  </div>
       </div>
 
