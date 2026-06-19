@@ -175,6 +175,33 @@ function backupData(data){
   URL.revokeObjectURL(url);
 }
 
+function restoreBackup(setData){
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const importedData = JSON.parse(text);
+
+      if (window.confirm("هل تريد استرجاع النسخة الاحتياطية؟")) {
+        setData(importedData);
+        alert("تم استرجاع البيانات بنجاح");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("الملف غير صالح أو تالف");
+    }
+  };
+
+  input.click();
+}
+
 // ── Export Word (HTML→.doc) ───────────────────────────────────────────────────
 async function exportWord(data, setWordStatus) {
   setWordStatus("generating");
@@ -480,6 +507,22 @@ useEffect(()=>{
   }}
 >
   💾 Backup
+</button>
+
+<button
+  onClick={()=>restoreBackup(setData)}
+  style={{
+    padding:"5px 12px",
+    borderRadius:6,
+    border:"1px solid rgba(255,255,255,0.35)",
+    background:"rgba(255,255,255,0.12)",
+    color:C.white,
+    cursor:"pointer",
+    fontSize:12,
+    fontWeight:600
+  }}
+>
+  🔄 Restore
 </button>
                  </div>
       </div>
