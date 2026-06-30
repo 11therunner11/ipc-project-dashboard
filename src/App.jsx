@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import * as XLSX from "xlsx";
 import { supabase } from "./supabase";
 const STORAGE_KEY = "ipc_project_v2";
@@ -367,6 +367,7 @@ const [newPillar,setNewPillar] = useState({
   const [draftWeights, setDraftW]   = useState({});
   const [saveStatus, setSaveStatus] = useState("saved");
   const [wordStatus, setWordStatus] = useState("idle");
+    const loaded = useRef(false);
 
   const overall = useMemo(()=>calcOverall(data),[data]);
 useEffect(() => {
@@ -400,7 +401,11 @@ if (
   setData(rows[0].data);
 } else {
   setData(DEFAULT_DATA);
-}}
+}
+
+loaded.current = true;
+
+}
 async function testConnection() {
   const { data, error } = await supabase
     .from("project_data")
@@ -411,6 +416,9 @@ async function testConnection() {
 }
   // ── حفظ تلقائي في المتصفح ────────────────────────────────────────────────
 useEffect(()=>{
+
+if (!loaded.current) return;
+
   const t=setTimeout(async ()=>{
     try{
 
