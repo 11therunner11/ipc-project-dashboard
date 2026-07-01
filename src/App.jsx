@@ -18,47 +18,48 @@ const STATUS_CONFIG = {
   "On Hold":     { color:C.hold,     bg:C.holdBg,      label:"معلق"  },
 };
 
+// ── البيانات بتاعتك كما هي بالضبط ────────────────────────────────────────────
 const DEFAULT_DATA = [
   { id:"P1", title:"Production", titleAr:"الإنتاج", weight:30, owner:"Eng. Ehab Eweis", tasks:[
-    { id:"P1-1", title:"توقيع عقد المصنع",           weight:25, status:"Open",        owner:"Eng. Ahmed Elmohamady", due:"2026-06-11" },
-    { id:"P1-2", title:"زيارة تحقق للموقع",            weight:10, status:"Open",        owner:"Projects + Technical",  due:""  },
-    { id:"P1-3", title:"إعداد المشتريات (BOM Final)", weight:15, status:"Open",        owner:"Eng. Ehab Eweis",       due:""        },
-    { id:"P1-4", title:"شراء وتوريد المعدات",          weight:20, status:"Open",        owner:"Procurement",           due:""        },
-    { id:"P1-5", title:"تركيب المعدات",                weight:15, status:"Open",        owner:"Projects",              due:""        },
-    { id:"P1-6", title:"شراء المواد الخام",             weight:8,  status:"Open",        owner:"Procurement",           due:""        },
-    { id:"P1-7", title:"تجربة تشغيلية أولى",           weight:7,  status:"Open",        owner:"Technical + Projects",  due:""        },
+    { id:"P1-1", title:"توقيع عقد المصنع",           weight:25, status:"Open",        owner:"Eng. Ahmed Elmohamady", due:"11-06-2026" },
+    { id:"P1-2", title:"زيارة تحقق للموقع",            weight:10, status:"Open",        owner:"Projects + Technical",  due:"بعد العقد"  },
+    { id:"P1-3", title:"إعداد المشتريات (BOM Final)", weight:15, status:"Open",        owner:"Eng. Ehab Eweis",       due:"TBD"        },
+    { id:"P1-4", title:"شراء وتوريد المعدات",          weight:20, status:"Open",        owner:"Procurement",           due:"TBD"        },
+    { id:"P1-5", title:"تركيب المعدات",                weight:15, status:"Open",        owner:"Projects",              due:"TBD"        },
+    { id:"P1-6", title:"شراء المواد الخام",             weight:8,  status:"Open",        owner:"Procurement",           due:"TBD"        },
+    { id:"P1-7", title:"تجربة تشغيلية أولى",           weight:7,  status:"Open",        owner:"Technical + Projects",  due:"TBD"        },
   ]},
   { id:"P2", title:"Product", titleAr:"المنتج", weight:20, owner:"Dr. Hanan Sayed", tasks:[
-    { id:"P2-1", title:"اعتماد اللون النهائي",          weight:20, status:"On Hold", owner:"Dr. Mohamed Eid",  due:"" },
-    { id:"P2-2", title:"تحديد موضع CAS Number",         weight:15, status:"On Hold", owner:"Technical / R&D",  due:"" },
-    { id:"P2-3", title:"إعداد Toxicity Assessment",    weight:15, status:"On Hold", owner:"Technical / R&D",  due:"" },
-    { id:"P2-4", title:"إصدار Datasheet نهائي",         weight:25, status:"On Hold", owner:"Dr. Hanan Sayed",  due:"" },
-    { id:"P2-5", title:"إصدار MSDS نهائي",              weight:25, status:"On Hold", owner:"Dr. Hanan Sayed",  due:"" },
+    { id:"P2-1", title:"اعتماد اللون النهائي",          weight:20, status:"On Hold", owner:"Dr. Mohamed Eid",  due:"TBD" },
+    { id:"P2-2", title:"تحديد موضع CAS Number",         weight:15, status:"On Hold", owner:"Technical / R&D",  due:"TBD" },
+    { id:"P2-3", title:"إعداد Toxicity Assessment",    weight:15, status:"On Hold", owner:"Technical / R&D",  due:"TBD" },
+    { id:"P2-4", title:"إصدار Datasheet نهائي",         weight:25, status:"On Hold", owner:"Dr. Hanan Sayed",  due:"TBD" },
+    { id:"P2-5", title:"إصدار MSDS نهائي",              weight:25, status:"On Hold", owner:"Dr. Hanan Sayed",  due:"TBD" },
   ]},
   { id:"P3", title:"Brand & Marketing", titleAr:"الهوية والتسويق", weight:15, owner:"Eng. Ahmed Elmohamady", tasks:[
-    { id:"P3-1", title:"حسم اسم المنتج النهائي",  weight:25, status:"Open", owner:"Eng. Tamer Ibrahim", due:"" },
-    { id:"P3-2", title:"تسجيل الدومين",            weight:15, status:"Open", owner:"Eng. Tamer Ibrahim", due:"" },
-    { id:"P3-3", title:"Packaging & Label Brief", weight:25, status:"Open", owner:"PM – Eng. Ahmed A.", due:"" },
-    { id:"P3-4", title:"تصميم الهوية البصرية",      weight:20, status:"Open", owner:"Marketing",          due:"" },
-    { id:"P3-5", title:"Campaign Calendar",        weight:15, status:"Open", owner:"BD / Marketing",     due:"" },
+    { id:"P3-1", title:"حسم اسم المنتج النهائي",  weight:25, status:"Open", owner:"Eng. Tamer Ibrahim", due:"TBD" },
+    { id:"P3-2", title:"تسجيل الدومين",            weight:15, status:"Open", owner:"Eng. Tamer Ibrahim", due:"TBD" },
+    { id:"P3-3", title:"Packaging & Label Brief", weight:25, status:"Open", owner:"PM – Eng. Ahmed A.", due:"TBD" },
+    { id:"P3-4", title:"تصميم الهوية البصرية",      weight:20, status:"Open", owner:"Marketing",          due:"TBD" },
+    { id:"P3-5", title:"Campaign Calendar",        weight:15, status:"Open", owner:"BD / Marketing",     due:"TBD" },
   ]},
   { id:"P4", title:"Sales & Pipeline", titleAr:"المبيعات والفرص", weight:15, owner:"Eng. Ahmed Elmohamady", tasks:[
-    { id:"P4-1", title:"إعداد Pipeline Sheet رسمي", weight:25, status:"Open",    owner:"Eng. Ahmed Elmohamady", due:"2026-06-11" },
-    { id:"P4-2", title:"تجهيز 10 عينات IPC",         weight:20, status:"Open",    owner:"Dr. Hanan + PM",        due:""        },
-    { id:"P4-3", title:"زيارات عملاء وجمع عينات",    weight:20, status:"Open",    owner:"Dr. Hanan + PM",        due:""        },
-    { id:"P4-4", title:"Pricing Matrix v0",          weight:20, status:"On Hold", owner:"BD + Finance",          due:""        },
-    { id:"P4-5", title:"Distribution Channel Map",  weight:15, status:"Open",    owner:"Eng. Ahmed Elmohamady", due:""        },
+    { id:"P4-1", title:"إعداد Pipeline Sheet رسمي", weight:25, status:"Open",    owner:"Eng. Ahmed Elmohamady", due:"11-06-2026" },
+    { id:"P4-2", title:"تجهيز 10 عينات IPC",         weight:20, status:"Open",    owner:"Dr. Hanan + PM",        due:"TBD"        },
+    { id:"P4-3", title:"زيارات عملاء وجمع عينات",    weight:20, status:"Open",    owner:"Dr. Hanan + PM",        due:"TBD"        },
+    { id:"P4-4", title:"Pricing Matrix v0",          weight:20, status:"On Hold", owner:"BD + Finance",          due:"TBD"        },
+    { id:"P4-5", title:"Distribution Channel Map",  weight:15, status:"Open",    owner:"Eng. Ahmed Elmohamady", due:"TBD"        },
   ]},
   { id:"P5", title:"Legal & Corporate", titleAr:"القانوني والمؤسسي", weight:10, owner:"Eng. Tamer Ibrahim", tasks:[
-    { id:"P5-1", title:"تأسيس الكيان القانوني",     weight:40, status:"In Progress", owner:"Eng. Tamer Ibrahim",  due:"" },
-    { id:"P5-2", title:"التراخيص الصناعية والبيئية",weight:35, status:"Open",        owner:"Legal / Management",  due:"" },
-    { id:"P5-3", title:"عقود الموردين والشركاء",    weight:25, status:"Open",        owner:"Management",          due:"" },
+    { id:"P5-1", title:"تأسيس الكيان القانوني",     weight:40, status:"In Progress", owner:"Eng. Tamer Ibrahim",  due:"TBD" },
+    { id:"P5-2", title:"التراخيص الصناعية والبيئية",weight:35, status:"Open",        owner:"Legal / Management",  due:"TBD" },
+    { id:"P5-3", title:"عقود الموردين والشركاء",    weight:25, status:"Open",        owner:"Management",          due:"TBD" },
   ]},
   { id:"P6", title:"R&D", titleAr:"البحث والتطوير", weight:10, owner:"Dr. Mohamed Eid", tasks:[
-    { id:"P6-1", title:"R&D Brief – Sewage Module",      weight:30, status:"Open", owner:"Dr. Mohamed Eid", due:"" },
-    { id:"P6-2", title:"R&D Brief – IWWT Module",        weight:30, status:"Open", owner:"Dr. Mohamed Eid", due:"" },
-    { id:"P6-3", title:"تجارب تحسين اللون",               weight:20, status:"Open", owner:"R&D / Technical", due:"" },
-    { id:"P6-4", title:"تطوير منتجات كيماوية مستقبلية",   weight:20, status:"Open", owner:"R&D",             due:"" },
+    { id:"P6-1", title:"R&D Brief – Sewage Module",      weight:30, status:"Open", owner:"Dr. Mohamed Eid", due:"TBD" },
+    { id:"P6-2", title:"R&D Brief – IWWT Module",        weight:30, status:"Open", owner:"Dr. Mohamed Eid", due:"TBD" },
+    { id:"P6-3", title:"تجارب تحسين اللون",               weight:20, status:"Open", owner:"R&D / Technical", due:"TBD" },
+    { id:"P6-4", title:"تطوير منتجات كيماوية مستقبلية",   weight:20, status:"Open", owner:"R&D",             due:"TBD" },
   ]},
 ];
 
@@ -72,50 +73,49 @@ function calcProgress(tasks) {
   return Math.round((done/total)*100);
 }
 
-// دالة مساعدة لتهيئة التواريخ بشكل سليم للمقارنة
-function parseDueDate(dateStr) {
-  if(!dateStr || dateStr === "TBD" || dateStr.includes("بعد")) return null;
-  // تحويل التواريخ التي قد تكون مكتوبة بأسلوب قديم DD-MM-YYYY إلى YYYY-MM-DD
-  if (dateStr.includes("-")) {
-    const parts = dateStr.split("-");
-    if (parts[0].length === 2 && parts[2].length === 4) {
-      return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-    }
-  }
-  return new Date(dateStr);
-}
-
 function getTodayTasks(data){
+
   const today = new Date();
   today.setHours(0,0,0,0);
 
   return data.flatMap(p =>
     p.tasks
       .filter(t => {
+
         if(!t.due || t.status==="Done") return false;
-        const dueDate = parseDueDate(t.due);
-        if(!dueDate) return false;
+
+        const dueDate = new Date(t.due);
         dueDate.setHours(0,0,0,0);
+
         return dueDate.getTime() === today.getTime();
       })
-      .map(t => ({ title: t.title, pillar: p.titleAr }))
+      .map(t => ({
+        title: t.title,
+        pillar: p.titleAr
+      }))
   );
 }
 
 function getOverdueTasks(data){
+
   const today = new Date();
   today.setHours(0,0,0,0);
 
   return data.flatMap(p =>
     p.tasks
       .filter(t => {
+
         if(!t.due || t.status==="Done") return false;
-        const dueDate = parseDueDate(t.due);
-        if(!dueDate) return false;
+
+        const dueDate = new Date(t.due);
         dueDate.setHours(0,0,0,0);
+
         return dueDate < today;
       })
-      .map(t => ({ title: t.title, pillar: p.titleAr }))
+      .map(t => ({
+        title: t.title,
+        pillar: p.titleAr
+      }))
   );
 }
 
@@ -154,6 +154,7 @@ function exportExcel(data) {
   const overall = calcOverall(data);
   const wb = XLSX.utils.book_new();
 
+  // Sheet 1: ملخص
   const s1 = [
     ["IPC Project – ملخص تقدم المشروع","","","","","",""],
     ["التاريخ:", new Date().toLocaleDateString("ar-EG"),"","التقدم الكلي:",`${overall}%`,"",""],
@@ -174,6 +175,7 @@ function exportExcel(data) {
   ws1["!cols"]=[{wch:28},{wch:10},{wch:24},{wch:12},{wch:10},{wch:10},{wch:10},{wch:10},{wch:12}];
   XLSX.utils.book_append_sheet(wb,ws1,"ملخص");
 
+  // Sheet 2: كل المهام
   const s2=[["العنوان الرئيسي","المهمة","المسؤول","الموعد","الوزن %","الحالة"]];
   data.forEach(p=>p.tasks.forEach(t=>{
     s2.push([p.titleAr,t.title,t.owner,t.due,t.weight,STATUS_CONFIG[t.status]?.label||t.status]);
@@ -182,6 +184,7 @@ function exportExcel(data) {
   ws2["!cols"]=[{wch:22},{wch:34},{wch:26},{wch:14},{wch:10},{wch:12}];
   XLSX.utils.book_append_sheet(wb,ws2,"كل المهام");
 
+  // Sheet per pillar
   data.forEach(p=>{
     const rows=[
       [`${p.titleAr} – ${p.title}`,"","","",""],
@@ -204,12 +207,16 @@ function backupData(data){
     [JSON.stringify(data, null, 2)],
     { type: "application/json" }
   );
+
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement("a");
   a.href = url;
   a.download = `IPC_Backup_${new Date().toISOString().slice(0,10)}.json`;
+
   document.body.appendChild(a);
   a.click();
+
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
@@ -218,33 +225,49 @@ function restoreBackup(setData){
   const input = document.createElement("input");
   input.type = "file";
   input.accept = ".json";
+
   input.onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     try {
       const text = await file.text();
       const importedData = JSON.parse(text);
+
       if (window.confirm("هل تريد استرجاع النسخة الاحتياطية؟")) {
         setData(importedData);
         alert("تم استرجاع البيانات بنجاح");
       }
+
     } catch (err) {
       console.error(err);
       alert("الملف غير صالح أو تالف");
     }
   };
+
   input.click();
 }
 
-// ── Export Word (المحلي والمعدل بالكامل لتلافي مشاكل الـ CORS) ───────────────────
+// ── Export Word (HTML→.doc) ───────────────────────────────────────────────────
 async function exportWord(data, setWordStatus) {
   setWordStatus("generating");
   const overall = calcOverall(data);
   const today = new Date().toLocaleDateString("ar-EG");
 
   try {
-    // تم استبدال طلب الـ API الخارجي بملخص تنفيذي ديناميكي واحترافي محلي
-    const summary = `يسير مشروع IPC بخطى ثابتة حيث بلغت نسبة الإنجاز الإجمالية للمشروع حوالي ${overall}% حتى تاريخ اليوم. تم إحراز تقدم ملحوظ في الأقسام الرئيسية ومتابعة مستمرة لجدول الأعمال والمهام المفتوحة لضمان الالتزام بالمعايير التشغيلية المحددة للتسليم الإداري والفني والبيئي وفقاً للخطة المتفق عليها مع أعضاء البورد الإداري.`;
+    const res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-6", max_tokens:1000,
+        messages:[{role:"user",content:`اكتب ملخصاً تنفيذياً باللغة العربية في 4-6 جمل مناسب لتقرير بورد الإدارة عن هذا المشروع. لا تستخدم markdown أو نجوم أو شرطات:
+
+IPC Project – تقدم المشروع الكلي: ${overall}%
+${data.map(p=>`${p.titleAr}: تقدم ${calcProgress(p.tasks)}% (وزن ${p.weight}%) – مكتمل ${p.tasks.filter(t=>t.status==="Done").length} / جاري ${p.tasks.filter(t=>t.status==="In Progress").length} / مفتوح ${p.tasks.filter(t=>t.status==="Open").length} / معلق ${p.tasks.filter(t=>t.status==="On Hold").length}`).join("\n")}`}]
+      })
+    });
+    const d = await res.json();
+    const summary = d.content?.[0]?.text || "لا يوجد ملخص متاح.";
 
     const statusColor = {Done:"#166534","In Progress":"#92400E",Open:"#1E3A5F","On Hold":"#7C3AED"};
     const statusLabel = {Done:"مكتمل","In Progress":"جاري",Open:"مفتوح","On Hold":"معلق"};
@@ -261,6 +284,8 @@ h2{color:#1F4E79;font-size:14pt;margin-top:24px;margin-bottom:4px}
 .summary{background:#F5F7FA;border-right:4px solid #1F4E79;padding:12px 16px;margin-bottom:20px;line-height:1.9;font-size:11pt}
 .prog-bg{background:#E5E7EB;border-radius:99px;height:10px;margin:6px 0 10px}
 .prog-fill{background:#2E75B6;border-radius:99px;height:10px}
+.pillar-head{display:flex;justify-content:space-between;align-items:center}
+.pct{font-size:18pt;font-weight:900;color:#1F4E79}
 table{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:6px}
 th{background:#1F4E79;color:white;padding:7px 10px;text-align:right;font-size:10pt}
 td{padding:6px 10px;border:1px solid #E5E7EB;vertical-align:top}
@@ -269,6 +294,7 @@ tr:nth-child(even) td{background:#F5F7FA}
 .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:10pt}
 .badge{padding:2px 10px;border-radius:99px;font-weight:bold}
 footer{margin-top:30px;font-size:9pt;color:#9CA3AF;text-align:center;border-top:1px solid #E5E7EB;padding-top:10px}
+@media print{body{margin:1.5cm}}
 </style>
 </head>
 <body>
@@ -276,7 +302,7 @@ footer{margin-top:30px;font-size:9pt;color:#9CA3AF;text-align:center;border-top:
 <div class="meta">تاريخ: ${today} &nbsp;|&nbsp; PM: Eng. Ahmed Aboelhasan &nbsp;|&nbsp; داخلي / Internal</div>
 <div class="overall">📊 التقدم الكلي للمشروع: ${overall}%</div>
 <h2>الملخص التنفيذي</h2>
-<div class="summary">${summary}</div>
+<div class="summary">${summary.replace(/\n/g,"<br>")}</div>
 ${data.map(p=>{
   const prog=calcProgress(p.tasks);
   const done=p.tasks.filter(t=>t.status==="Done").length;
@@ -284,12 +310,12 @@ ${data.map(p=>{
   const open=p.tasks.filter(t=>t.status==="Open").length;
   const hold=p.tasks.filter(t=>t.status==="On Hold").length;
   return `
-<h2><div style="display:flex;justify-content:space-between;"><span>${p.titleAr} | ${p.title}</span><span>${prog}%</span></div></h2>
+<h2><div class="pillar-head"><span>${p.titleAr} | ${p.title}</span><span class="pct">${prog}%</span></div></h2>
 <div class="prog-bg"><div class="prog-fill" style="width:${prog}%"></div></div>
 <div class="pillar-info">المسؤول: ${p.owner} &nbsp;|&nbsp; وزن العنوان: ${p.weight}% من المشروع &nbsp;|&nbsp; إجمالي المهام: ${p.tasks.length}</div>
 <table>
 <tr><th>المهمة</th><th>المسؤول</th><th>الموعد</th><th>الوزن</th><th>الحالة</th></tr>
-${p.tasks.map(t=>`<tr><td>${t.title}</td><td>${t.owner}</td><td>${t.due || "TBD"}</td><td style="text-align:center">${t.weight}%</td><td style="color:${statusColor[t.status]||"#333"};font-weight:bold">${statusLabel[t.status]||t.status}</td></tr>`).join("")}
+${p.tasks.map(t=>`<tr><td>${t.title}</td><td>${t.owner}</td><td>${t.due}</td><td style="text-align:center">${t.weight}%</td><td style="color:${statusColor[t.status]||"#333"};font-weight:bold">${statusLabel[t.status]||t.status}</td></tr>`).join("")}
 </table>
 <div class="badges">
 ${done>0?`<span class="badge" style="color:#166534;background:#DCFCE7">✓ مكتمل ${done}</span>`:""}
@@ -317,6 +343,7 @@ ${hold>0?`<span class="badge" style="color:#7C3AED;background:#EDE9FE">⏸ مع�
 
 // ── Main App ──────────────────────────────────────────────────────────────────
 export default function App() {
+  // حفظ تلقائي: لو في بيانات محفوظة نستخدمها، غير كده DEFAULT_DATA
   const [data, setData] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -324,111 +351,150 @@ export default function App() {
     } catch { return DEFAULT_DATA; }
   });
 
-  const [view, setView] = useState("dashboard");
-  const [showAddPillar, setShowAddPillar] = useState(false);
+  const [view, setView]             = useState("dashboard");
+const [showAddPillar,setShowAddPillar] = useState(false);
 
-  const [newPillar, setNewPillar] = useState({ titleAr:"", title:"", owner:"", weight:10 });
+const [newPillar,setNewPillar] = useState({
+  titleAr:"",
+  title:"",
+  owner:"",
+  weight:10
+});
   const [addingTask, setAddingTask] = useState(null);
-  const [newTask, setNewTask] = useState({title:"",weight:10,status:"Open",owner:"",due:""});
-  const [editingTask, setEditTask] = useState(null);
-  const [editingWeights, setEditW] = useState(false);
-  const [draftWeights, setDraftW] = useState({});
+  const [newTask, setNewTask]       = useState({title:"",weight:10,status:"Open",owner:"",due:"TBD"});
+  const [editingTask, setEditTask]  = useState(null);
+  const [editingWeights, setEditW]  = useState(false);
+  const [draftWeights, setDraftW]   = useState({});
   const [saveStatus, setSaveStatus] = useState("saved");
   const [wordStatus, setWordStatus] = useState("idle");
-  const loaded = useRef(false);
+    const loaded = useRef(false);
 
   const overall = useMemo(()=>calcOverall(data),[data]);
+useEffect(() => {
+  testConnection();
+}, []);
+useEffect(() => {
+  loadData();
+}, []);
 
-  // دمج التهيئة الأولية والتحميل في خطوة واحدة منظمة
-  useEffect(() => {
-    async function initProject() {
-      // تجربة الاتصال وتحميل البيانات معاً
-      try {
-        const { data: rows, error } = await supabase.from("project_data").select("*").limit(1);
-        if (error) {
-          console.log("Supabase Connection/Load Error:", error);
-          setData(DEFAULT_DATA);
-        } else if (rows && rows.length > 0 && Array.isArray(rows[0].data)) {
-          setData(rows[0].data);
-        } else {
-          setData(DEFAULT_DATA);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-      loaded.current = true;
-    }
-    initProject();
-  }, []);
+async function loadData() {
+  const { data: rows, error } = await supabase
+    .from("project_data")
+    .select("*")
+    .limit(1);
 
-  // الحفظ التلقائي المحلي والمزامنة مع السوبابيس
-  useEffect(()=>{
-    if (!loaded.current) return;
-    setSaveStatus("saving");
-    const t=setTimeout(async ()=>{
-      try{
-        localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
-        const { error } = await supabase.from("project_data").update({ data: data }).eq("id",1);
-        if(error){
-          console.log(error);
-          setSaveStatus("error");
-        }else{
-          setSaveStatus("saved");
-        }
-      }catch(e){
-        console.log(e);
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  console.log("LOADED:", rows);
+
+console.log("COPY THIS:");
+console.log(JSON.stringify(DEFAULT_DATA));
+
+if (
+  rows.length > 0 &&
+  Array.isArray(rows[0].data) &&
+  rows[0].data.length > 0
+) {
+  setData(rows[0].data);
+} else {
+  setData(DEFAULT_DATA);
+}
+
+loaded.current = true;
+
+}
+async function testConnection() {
+  const { data, error } = await supabase
+    .from("project_data")
+    .select("*");
+
+  console.log("SUPABASE DATA:", data);
+  console.log("SUPABASE ERROR:", error);
+}
+  // ── حفظ تلقائي في المتصفح ────────────────────────────────────────────────
+useEffect(()=>{
+
+if (!loaded.current) return;
+
+  const t=setTimeout(async ()=>{
+    try{
+
+      // حفظ محلي
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+
+      // حفظ في Supabase
+      const { error } = await supabase
+        .from("project_data")
+        .update({
+          data: data
+        })
+        .eq("id",1);
+
+      if(error){
+        console.log(error);
         setSaveStatus("error");
+      }else{
+        setSaveStatus("saved");
       }
-    },700);
-    return ()=>clearTimeout(t);
-  },[data]);
 
+    }catch(e){
+      console.log(e);
+      setSaveStatus("error");
+    }
+  },700);
+
+  return ()=>clearTimeout(t);
+},[data]);
   // ── Mutations ─────────────────────────────────────────────────────────────
   function updateTask(pillarId,taskId,field,value){
     setData(d=>d.map(p=>p.id!==pillarId?p:{
       ...p,tasks:p.tasks.map(t=>t.id!==taskId?t:{...t,[field]:field==="weight"?Number(value):value})
     }));
   }
-
   function deleteTask(pillarId,taskId){
     setData(d=>d.map(p=>p.id!==pillarId?p:{...p,tasks:p.tasks.filter(t=>t.id!==taskId)}));
     if(editingTask?.taskId===taskId) setEditTask(null);
   }
+function addPillar(){
 
-  function addPillar(){
-    if(!newPillar.titleAr.trim()) return;
-    const pillar = {
-      id: Date.now().toString(),
-      titleAr: newPillar.titleAr,
-      title: newPillar.title,
-      owner: newPillar.owner,
-      weight: Number(newPillar.weight),
-      tasks:[]
-    };
-    setData(d=>[...d,pillar]);
-    setNewPillar({ titleAr:"", title:"", owner:"", weight:10 });
-    setShowAddPillar(false);
-  }
+  const pillar = {
+    id: Date.now().toString(),
+    titleAr: newPillar.titleAr,
+    title: newPillar.title,
+    owner: newPillar.owner,
+    weight: Number(newPillar.weight),
+    tasks:[]
+  };
 
+  setData(d=>[...d,pillar]);
+
+  setNewPillar({
+    titleAr:"",
+    title:"",
+    owner:"",
+    weight:10
+  });
+
+  setShowAddPillar(false);
+}
   function addTask(pillarId){
     if(!newTask.title.trim()) return;
     setData(d=>d.map(p=>p.id!==pillarId?p:{...p,tasks:[...p.tasks,{...newTask,id:`${pillarId}-${Date.now()}`,weight:Number(newTask.weight)}]}));
-    setNewTask({title:"",weight:10,status:"Open",owner:"",due:""});
+    setNewTask({title:"",weight:10,status:"Open",owner:"",due:"TBD"});
     setAddingTask(null);
   }
-
   function startEditWeights(){
     const w={};data.forEach(p=>{w[p.id]=p.weight;});setDraftW(w);setEditW(true);
   }
-
-  // التحقق الفعلي من مجموع أوزان العناوين الرئيسية لتساوي 100%
   function saveWeights(){
     const total=Object.values(draftWeights).reduce((s,v)=>s+Number(v),0);
     if(total!==100){alert(`مجموع الأوزان = ${total}%، لازم يكون 100%`);return;}
     setData(d=>d.map(p=>({...p,weight:Number(draftWeights[p.id])})));
     setEditW(false);
   }
-
   function resetData(){
     if(window.confirm("هتمسح كل التعديلات وترجع للبيانات الأصلية؟")){
       localStorage.removeItem(STORAGE_KEY);
@@ -436,7 +502,7 @@ export default function App() {
     }
   }
 
-  // ── Task Row ───────────────────────────────────────────────────────────────
+  // ── Task Row (mobile-first) ───────────────────────────────────────────────
   function TaskRow({pillar,task}){
     const isEditing=editingTask?.pillarId===pillar.id&&editingTask?.taskId===task.id;
     if(isEditing) return(
@@ -446,8 +512,18 @@ export default function App() {
         <div style={{display:"flex",gap:6,marginBottom:6}}>
           <input value={task.owner} onChange={e=>updateTask(pillar.id,task.id,"owner",e.target.value)}
             placeholder="المسؤول" style={{flex:2,padding:"6px 8px",border:`1px solid ${C.grayLight}`,borderRadius:6,fontSize:12}}/>
-          <input type="date" value={task.due || ""} onChange={e=>updateTask(pillar.id,task.id,"due",e.target.value)}
-            style={{flex:1,padding:"6px 8px",border:`1px solid ${C.grayLight}`,borderRadius:6,fontSize:12}}/>
+          <input
+  type="date"
+  value={task.due || ""}
+  onChange={e=>updateTask(pillar.id,task.id,"due",e.target.value)}
+  style={{
+    flex:1,
+    padding:"6px 8px",
+    border:`1px solid ${C.grayLight}`,
+    borderRadius:6,
+    fontSize:12
+  }}
+/>
         </div>
         <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:8}}>
           <span style={{fontSize:12,color:C.gray,whiteSpace:"nowrap"}}>الوزن %</span>
@@ -469,7 +545,7 @@ export default function App() {
       <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.grayLight}`,display:"flex",alignItems:"center",gap:8}}>
         <div style={{flex:1,minWidth:0}}>
           <div style={{fontSize:13,fontWeight:600,color:task.status==="Done"?C.gray:C.navy,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
-          <div style={{fontSize:11,color:C.gray,marginTop:2}}>{task.owner} · {task.due || "TBD"}</div>
+          <div style={{fontSize:11,color:C.gray,marginTop:2}}>{task.owner} · {task.due}</div>
         </div>
         <span style={{fontSize:11,fontWeight:700,color:C.blueMid,background:C.blueLight,padding:"2px 8px",borderRadius:99,whiteSpace:"nowrap"}}>{task.weight}%</span>
         <select value={task.status} onChange={e=>updateTask(pillar.id,task.id,"status",e.target.value)}
@@ -486,17 +562,17 @@ export default function App() {
       </div>
     );
   }
+const todayTasks = getTodayTasks(data);
+const overdueTasks = getOverdueTasks(data);
 
-  const todayTasks = getTodayTasks(data);
-  const overdueTasks = getOverdueTasks(data);
-
-  const saveLabel=saveStatus["saving"]?"⏳ جاري الحفظ...":saveStatus==="saved"?"✓ محفوظ":"⚠ خطأ في الحفظ";
+  const saveLabel=saveStatus==="saving"?"⏳ جاري الحفظ...":saveStatus==="saved"?"✓ محفوظ":"⚠ خطأ في الحفظ";
   const saveColor=saveStatus==="saved"?C.done:saveStatus==="saving"?C.progress:C.red;
 
+  // ════════════════════════════════════════════════════════════════════════════
   return(
     <div style={{fontFamily:"'Segoe UI',Arial,sans-serif",background:C.offwhite,minHeight:"100vh",direction:"rtl"}}>
 
-      {/* Top Header */}
+      {/* Header */}
       <div style={{background:C.blue,color:C.white,padding:"12px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
         <div>
           <div style={{fontSize:17,fontWeight:800}}>IPC Project — لوحة إدارة المشروع</div>
@@ -509,35 +585,88 @@ export default function App() {
               background:view===v?C.white:"rgba(255,255,255,0.18)",color:view===v?C.blue:C.white
             }}>{l}</button>
           ))}
-          <button onClick={()=>exportExcel(data)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>📊 Excel</button>
-          <button onClick={()=>exportWord(data, setWordStatus)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:wordStatus==="generating"?"#92400E":"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>
-            {wordStatus==="generating"?"⏳ جاري تحضير وورد...":"📝 Word تقرير"}
+          <button onClick={()=>exportExcel(data)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>
+            📊 Excel
           </button>
-          <button onClick={()=>backupData(data)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>💾 Backup</button>
-          <button onClick={()=>restoreBackup(setData)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>🔄 Restore</button>
-        </div>
+
+<button
+  onClick={()=>backupData(data)}
+  style={{
+    padding:"5px 12px",
+    borderRadius:6,
+    border:"1px solid rgba(255,255,255,0.35)",
+    background:"rgba(255,255,255,0.12)",
+    color:C.white,
+    cursor:"pointer",
+    fontSize:12,
+    fontWeight:600
+  }}
+>
+  💾 Backup
+</button>
+
+<button
+  onClick={()=>restoreBackup(setData)}
+  style={{
+    padding:"5px 12px",
+    borderRadius:6,
+    border:"1px solid rgba(255,255,255,0.35)",
+    background:"rgba(255,255,255,0.12)",
+    color:C.white,
+    cursor:"pointer",
+    fontSize:12,
+    fontWeight:600
+  }}
+>
+  🔄 Restore
+</button>
+                 </div>
+      </div>
+{(todayTasks.length>0 || overdueTasks.length>0) && (
+<div style={{
+  background:"#fff",
+  border:"1px solid #ddd",
+  borderRadius:8,
+  padding:"10px",
+  margin:"10px 18px"
+}}>
+
+  <div style={{fontWeight:700,marginBottom:8}}>
+    التنبيهات
+  </div>
+
+  {overdueTasks.length>0 && (
+    <div style={{marginBottom:10}}>
+      <div style={{color:"#c62828",fontWeight:700}}>
+        🔴 مهام متأخرة: {overdueTasks.length}
       </div>
 
-      {/* Alerts Section */}
-      {(todayTasks.length>0 || overdueTasks.length>0) && (
-        <div style={{background:"#fff",border:"1px solid #ddd",borderRadius:8,padding:"14px",margin:"10px 18px",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"}}>
-          <div style={{fontWeight:700,marginBottom:8,color:C.navy,fontSize:14}}>⚠️ نظام التنبيهات الذكي للمشروع:</div>
-          {overdueTasks.length>0 && (
-            <div style={{marginBottom:10}}>
-              <div style={{color:"#c62828",fontWeight:700,fontSize:13}}>🔴 مهام متأخرة ({overdueTasks.length}):</div>
-              {overdueTasks.map((t,i)=><div key={i} style={{fontSize:12,color:"#555",marginRight:10,marginTop:2}}>• {t.title} <span style={{fontSize:10,color:C.gray}}>({t.pillar})</span></div>)}
-            </div>
-          )}
-          {todayTasks.length>0 && (
-            <div>
-              <div style={{color:"#ef6c00",fontWeight:700,fontSize:13}}>🟡 مهام تستحق اليوم ({todayTasks.length}):</div>
-              {todayTasks.map((t,i)=><div key={i} style={{fontSize:12,color:"#555",marginRight:10,marginTop:2}}>• {t.title} <span style={{fontSize:10,color:C.gray}}>({t.pillar})</span></div>)}
-            </div>
-          )}
+      {overdueTasks.map((t,i)=>(
+        <div key={i}>
+          • {t.title}
         </div>
-      )}
+      ))}
+    </div>
+  )}
 
-      {/* Progress Counter Line */}
+  {todayTasks.length>0 && (
+    <div>
+      <div style={{color:"#ef6c00",fontWeight:700}}>
+        🟡 مهام اليوم: {todayTasks.length}
+      </div>
+
+      {todayTasks.map((t,i)=>(
+        <div key={i}>
+          • {t.title}
+        </div>
+      ))}
+    </div>
+  )}
+
+</div>
+)}
+
+      {/* Overall + save indicator */}
       <div style={{background:C.navy,padding:"10px 18px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
         <span style={{color:C.white,fontWeight:700,fontSize:13,whiteSpace:"nowrap"}}>تقدم المشروع الكلي</span>
         <div style={{flex:1,minWidth:100}}><ProgressBar pct={overall} height={12}/></div>
@@ -547,33 +676,101 @@ export default function App() {
         <button onClick={resetData} title="إعادة تعيين البيانات" style={{padding:"3px 8px",borderRadius:5,border:"1px solid rgba(255,120,120,0.4)",background:"transparent",color:"rgba(255,160,160,0.9)",cursor:"pointer",fontSize:11}}>↺</button>
       </div>
 
-      {/* Add Pillar Modal */}
-      {showAddPillar && (
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center"}}>
-          <div style={{background:"#fff",padding:20,borderRadius:10,width:420,maxWidth:"95%"}}>
-            <h3 style={{marginTop:0,color:C.blue}}>إضافة مهمة رئيسية (Pillar)</h3>
-            <input placeholder="الاسم العربي (مثل: الإنتاج)" value={newPillar.titleAr} onChange={e=>setNewPillar(p=>({...p,titleAr:e.target.value}))} style={{width:"100%",padding:8,marginBottom:8,borderRadius:5,border:"1px solid #ccc"}} />
-            <input placeholder="الاسم الإنجليزي (مثل: Production)" value={newPillar.title} onChange={e=>setNewPillar(p=>({...p,title:e.target.value}))} style={{width:"100%",padding:8,marginBottom:8,borderRadius:5,border:"1px solid #ccc"}} />
-            <input placeholder="المسؤول" value={newPillar.owner} onChange={e=>setNewPillar(p=>({...p,owner:e.target.value}))} style={{width:"100%",padding:8,marginBottom:8,borderRadius:5,border:"1px solid #ccc"}} />
-            <input type="number" placeholder="الوزن" value={newPillar.weight} onChange={e=>setNewPillar(p=>({...p,weight:e.target.value}))} style={{width:"100%",padding:8,marginBottom:12,borderRadius:5,border:"1px solid #ccc"}} />
-            <div style={{display:"flex",gap:8}}>
-              <button onClick={addPillar} style={{flex:1,padding:"10px",background:"#0b5ed7",color:"#fff",border:"none",borderRadius:6,cursor:"pointer",fontWeight:"bold"}}>حفظ القسم</button>
-              <button onClick={()=>setShowAddPillar(false)} style={{flex:1,padding:"10px",border:"1px solid #ccc",borderRadius:6,cursor:"pointer"}}>إلغاء</button>
-            </div>
-          </div>
-        </div>
-      )}
+{showAddPillar && (
+  <div style={{
+    position:"fixed",
+    inset:0,
+    background:"rgba(0,0,0,0.5)",
+    zIndex:300,
+    display:"flex",
+    alignItems:"center",
+    justifyContent:"center"
+  }}>
 
-      {/* Weights Modal */}
-      {editingWeights && (
+    <div style={{
+      background:"#fff",
+      padding:20,
+      borderRadius:10,
+      width:420,
+      maxWidth:"95%"
+    }}>
+
+      <h3 style={{marginTop:0}}>إضافة مهمة رئيسية</h3>
+
+      <input
+        placeholder="الاسم العربي"
+        value={newPillar.titleAr}
+        onChange={e=>setNewPillar(p=>({...p,titleAr:e.target.value}))}
+        style={{width:"100%",padding:8,marginBottom:8}}
+      />
+
+      <input
+        placeholder="الاسم الإنجليزي"
+        value={newPillar.title}
+        onChange={e=>setNewPillar(p=>({...p,title:e.target.value}))}
+        style={{width:"100%",padding:8,marginBottom:8}}
+      />
+
+      <input
+        placeholder="المسؤول"
+        value={newPillar.owner}
+        onChange={e=>setNewPillar(p=>({...p,owner:e.target.value}))}
+        style={{width:"100%",padding:8,marginBottom:8}}
+      />
+
+      <input
+        type="number"
+        placeholder="الوزن"
+        value={newPillar.weight}
+        onChange={e=>setNewPillar(p=>({...p,weight:e.target.value}))}
+        style={{width:"100%",padding:8,marginBottom:12}}
+      />
+
+      <div style={{display:"flex",gap:8}}>
+
+        <button
+          onClick={addPillar}
+          style={{
+            flex:1,
+            padding:"10px",
+            background:"#0b5ed7",
+            color:"#fff",
+            border:"none",
+            borderRadius:6
+          }}
+        >
+          حفظ
+        </button>
+
+        <button
+          onClick={()=>setShowAddPillar(false)}
+          style={{
+            flex:1,
+            padding:"10px",
+            border:"1px solid #ccc",
+            borderRadius:6
+          }}
+        >
+          إلغاء
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+
+      {/* Weights modal */}
+      {editingWeights&&(
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
           <div style={{background:C.white,borderRadius:12,padding:24,width:"100%",maxWidth:360,boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
             <div style={{fontSize:16,fontWeight:800,marginBottom:4,color:C.blue}}>أوزان العناوين الرئيسية</div>
-            <div style={{fontSize:12,color:C.gray,marginBottom:14}}>المجموع الكلي يجب أن يساوي 100% دائماً</div>
+            <div style={{fontSize:12,color:C.gray,marginBottom:14}}>المجموع لازم يساوي 100%</div>
             {data.map(p=>(
               <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
                 <span style={{flex:1,fontSize:13,fontWeight:600}}>{p.titleAr}</span>
-                <input type="number" min="0" max="100" value={draftWeights[p.id]!==undefined?draftWeights[p.id]:p.weight}
+                <input type="number" min="0" max="100" value={draftWeights[p.id]??p.weight}
                   onChange={e=>setDraftW(w=>({...w,[p.id]:e.target.value}))}
                   style={{width:60,padding:"5px 8px",border:`1px solid ${C.grayLight}`,borderRadius:5,textAlign:"center",fontSize:14}}/>
                 <span style={{color:C.gray,fontSize:12}}>%</span>
@@ -581,86 +778,119 @@ export default function App() {
             ))}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
               <span style={{fontSize:13,fontWeight:700,color:Object.values(draftWeights).reduce((s,v)=>s+Number(v),0)===100?C.done:C.red}}>
-                المجموع الحالي: {Object.values(draftWeights).reduce((s,v)=>s+Number(v),0)}%
+                المجموع: {Object.values(draftWeights).reduce((s,v)=>s+Number(v),0)}%
               </span>
               <div style={{display:"flex",gap:8}}>
                 <button onClick={()=>setEditW(false)} style={{padding:"6px 14px",borderRadius:6,border:`1px solid ${C.grayLight}`,background:C.white,cursor:"pointer"}}>إلغاء</button>
-                <button onClick={saveWeights} style={{padding:"6px 14px",borderRadius:6,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontWeight:700}}>حفظ الأوزان</button>
+                <button onClick={saveWeights} style={{padding:"6px 14px",borderRadius:6,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontWeight:700}}>حفظ</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Main Content Area */}
       <div style={{padding:"16px 18px"}}>
 
-        {/* ══ DASHBOARD VIEW ════════════════════════════════════════════════════ */}
-        {view==="dashboard" && (
-          <>
-            <div style={{marginBottom:12}}>
-              <button onClick={()=>setShowAddPillar(true)} style={{padding:"8px 14px",borderRadius:6,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontWeight:700}}>➕ إضافة قسم رئيسي جديد</button>
-            </div>
+        {/* ══ DASHBOARD ════════════════════════════════════════════════════ */}
+        {view==="dashboard"&&(
+<>
+  <div style={{marginBottom:12}}>
+    <button
+      onClick={()=>setShowAddPillar(true)}
+      style={{
+        padding:"8px 14px",
+        borderRadius:6,
+        border:"none",
+        background:C.blue,
+        color:C.white,
+        cursor:"pointer",
+        fontWeight:700
+      }}
+    >
+      ➕ إضافة مهمة رئيسية
+    </button>
+  </div>
 
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(360px,1fr))",gap:14}}>
-              {data.map(pillar=>{
-                const prog=calcProgress(pillar.tasks);
-                return(
-                  <div key={pillar.id} style={{background:C.white,borderRadius:10,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",border:`1px solid ${C.grayLight}`}}>
-                    <div style={{background:C.blue,padding:"11px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                      <div>
-                        <div style={{color:C.white,fontWeight:800,fontSize:15}}>{pillar.titleAr}</div>
-                        <div style={{color:"rgba(255,255,255,0.6)",fontSize:11,marginTop:1}}>{pillar.title} · {pillar.owner}</div>
-                      </div>
-                      <div style={{textAlign:"center"}}>
-                        <div style={{color:C.white,fontWeight:900,fontSize:22}}>{prog}%</div>
-                        <div style={{color:"rgba(255,255,255,0.55)",fontSize:10}}>وزن {pillar.weight}%</div>
-                      </div>
+  <div style={{
+    display:"grid",
+    gridTemplateColumns:"repeat(auto-fill,minmax(360px,1fr))",
+    gap:14
+  }}>
+
+    {data.map(pillar=>{
+      const prog=calcProgress(pillar.tasks);
+      return(
+                <div key={pillar.id} style={{background:C.white,borderRadius:10,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",border:`1px solid ${C.grayLight}`}}>
+                  <div style={{background:C.blue,padding:"11px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div>
+                      <div style={{color:C.white,fontWeight:800,fontSize:15}}>{pillar.titleAr}</div>
+                      <div style={{color:"rgba(255,255,255,0.6)",fontSize:11,marginTop:1}}>{pillar.title} · {pillar.owner}</div>
                     </div>
-                    <div style={{padding:"8px 14px 4px",display:"flex",alignItems:"center",gap:8}}>
-                      <div style={{flex:1}}><ProgressBar pct={prog} height={5}/></div>
-                      <WeightWarning tasks={pillar.tasks}/>
-                    </div>
-                    <div style={{borderTop:`1px solid ${C.grayLight}`,marginTop:4}}>
-                      {pillar.tasks.map(task=><TaskRow key={task.id} pillar={pillar} task={task}/>)}
-                      
-                      {addingTask===pillar.id ? (
-                        <div style={{padding:"10px 14px",background:"#F0F5FF",borderTop:`1px solid ${C.blueLight}`}}>
-                          <div style={{fontSize:11,fontWeight:700,color:C.blue,marginBottom:6}}>إضافة مهمة فرعية جديدة</div>
-                          <input placeholder="عنوان المهمة المباشرة *" value={newTask.title} onChange={e=>setNewTask(n=>({...n,title:e.target.value}))} style={{width:"100%",padding:"5px 8px",borderRadius:5,border:`1px solid ${C.grayLight}`,marginBottom:6,fontSize:12,boxSizing:"border-box"}}/>
-                          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:6}}>
-                            <input placeholder="المسؤول عنها" value={newTask.owner} onChange={e=>setNewTask(n=>({...n,owner:e.target.value}))} style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
-                            <input type="date" value={newTask.due || ""} onChange={e=>setNewTask(n=>({...n,due:e.target.value}))} style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
-                          </div>
-                          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                            <label style={{fontSize:11,color:C.gray,whiteSpace:"nowrap"}}>الوزن %</label>
-                            <input type="number" min="1" max="100" value={newTask.weight} onChange={e=>setNewTask(n=>({...n,weight:e.target.value}))} style={{width:58,padding:"4px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:12,textAlign:"center"}}/>
-                            <span style={{fontSize:11,color:taskWeightSum(pillar.tasks)+Number(newTask.weight)>100?C.red:C.done}}>
-                              الإجمالي: {taskWeightSum(pillar.tasks)+Number(newTask.weight)}%
-                            </span>
-                            <select value={newTask.status} onChange={e=>setNewTask(n=>({...n,status:e.target.value}))} style={{fontSize:11,border:`1px solid ${C.grayLight}`,borderRadius:5,padding:"4px 3px"}}>
-                              {Object.keys(STATUS_CONFIG).map(s=><option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
-                            </select>
-                          </div>
-                          <div style={{display:"flex",gap:6}}>
-                            <button onClick={()=>addTask(pillar.id)} style={{flex:1,padding:"7px",borderRadius:5,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontSize:12,fontWeight:700}}>+ إضافة الأن</button>
-                            <button onClick={()=>setAddingTask(null)} style={{padding:"7px 12px",borderRadius:5,border:`1px solid ${C.grayLight}`,background:C.white,cursor:"pointer",fontSize:12}}>إلغاء</button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button onClick={()=>setAddingTask(pillar.id)} style={{width:"100%",padding:"8px",border:"none",background:"transparent",color:C.blueMid,cursor:"pointer",fontSize:12,fontWeight:600,borderTop:`1px dashed ${C.blueLight}`}}>+ إضافة مهمة فرعية جديدة</button>
-                      )}
+                    <div style={{textAlign:"center"}}>
+                      <div style={{color:C.white,fontWeight:900,fontSize:22}}>{prog}%</div>
+                      <div style={{color:"rgba(255,255,255,0.55)",fontSize:10}}>وزن {pillar.weight}%</div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </>
-        )}
+                  <div style={{padding:"8px 14px 4px",display:"flex",alignItems:"center",gap:8}}>
+                    <div style={{flex:1}}><ProgressBar pct={prog} height={5}/></div>
+                    <WeightWarning tasks={pillar.tasks}/>
+                  </div>
+                  <div style={{borderTop:`1px solid ${C.grayLight}`,marginTop:4}}>
+                    {pillar.tasks.map(task=><TaskRow key={task.id} pillar={pillar} task={task}/>)}
+                    {addingTask===pillar.id?(
+                      <div style={{padding:"10px 14px",background:"#F0F5FF",borderTop:`1px solid ${C.blueLight}`}}>
+                        <div style={{fontSize:11,fontWeight:700,color:C.blue,marginBottom:6}}>مهمة جديدة</div>
+                        <input placeholder="عنوان المهمة *" value={newTask.title} onChange={e=>setNewTask(n=>({...n,title:e.target.value}))}
+                          style={{width:"100%",padding:"5px 8px",borderRadius:5,border:`1px solid ${C.grayLight}`,marginBottom:6,fontSize:12,boxSizing:"border-box"}}/>
+                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:6}}>
+                          <input placeholder="المسؤول" value={newTask.owner} onChange={e=>setNewTask(n=>({...n,owner:e.target.value}))}
+                            style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
+                          <input
+  type="date"
+  value={newTask.due || ""}
+  onChange={e=>setNewTask(n=>({...n,due:e.target.value}))}
+  style={{
+    padding:"5px 6px",
+    borderRadius:5,
+    border:`1px solid ${C.grayLight}`,
+    fontSize:11
+  }}
+/>
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                          <label style={{fontSize:11,color:C.gray,whiteSpace:"nowrap"}}>الوزن %</label>
+                          <input type="number" min="1" max="100" value={newTask.weight} onChange={e=>setNewTask(n=>({...n,weight:e.target.value}))}
+                            style={{width:58,padding:"4px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:12,textAlign:"center"}}/>
+                          <span style={{fontSize:11,color:taskWeightSum(pillar.tasks)+Number(newTask.weight)>100?C.red:C.done}}>
+                            المجموع: {taskWeightSum(pillar.tasks)+Number(newTask.weight)}%
+                          </span>
+                          <select value={newTask.status} onChange={e=>setNewTask(n=>({...n,status:e.target.value}))}
+                            style={{fontSize:11,border:`1px solid ${C.grayLight}`,borderRadius:5,padding:"4px 3px"}}>
+                            {Object.keys(STATUS_CONFIG).map(s=><option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
+                          </select>
+                        </div>
+                        <div style={{display:"flex",gap:6}}>
+                          <button onClick={()=>addTask(pillar.id)} style={{flex:1,padding:"7px",borderRadius:5,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontSize:12,fontWeight:700}}>+ إضافة</button>
+                          <button onClick={()=>setAddingTask(null)} style={{padding:"7px 12px",borderRadius:5,border:`1px solid ${C.grayLight}`,background:C.white,cursor:"pointer",fontSize:12}}>إلغاء</button>
+                        </div>
+                      </div>
+                    ):(
+                      <button onClick={()=>setAddingTask(pillar.id)} style={{
+                        width:"100%",padding:"8px",border:"none",background:"transparent",
+                        color:C.blueMid,cursor:"pointer",fontSize:12,fontWeight:600,
+                        borderTop:`1px dashed ${C.blueLight}`}}>+ إضافة مهمة</button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+</>
+)}
 
-        {/* ══ KANBAN VIEW ═══════════════════════════════════════════════════════ */}
-        {view==="board" && (
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:12}}>
+        {/* ══ KANBAN ═══════════════════════════════════════════════════════ */}
+        {view==="board"&&(
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12}}>
             {Object.entries(STATUS_CONFIG).map(([status,cfg])=>{
               const all=data.flatMap(p=>p.tasks.filter(t=>t.status===status).map(t=>({...t,pillarId:p.id,pillarAr:p.titleAr})));
               return(
@@ -691,16 +921,16 @@ export default function App() {
           </div>
         )}
 
-        {/* ══ EXECUTIVE REPORT VIEW ══════════════════════════════════════════════ */}
-        {view==="report" && (
+        {/* ══ REPORT ═══════════════════════════════════════════════════════ */}
+        {view==="report"&&(
           <div style={{maxWidth:860,margin:"0 auto"}}>
             <div style={{background:C.blue,color:C.white,borderRadius:"10px 10px 0 0",padding:"18px 24px"}}>
               <div style={{fontSize:11,opacity:0.6,marginBottom:3}}>تقرير تقدم المشروع – للشركاء · داخلي</div>
-              <div style={{fontSize:20,fontWeight:900}}>IPC Project — تقرير تنفيذي متكامل</div>
+              <div style={{fontSize:20,fontWeight:900}}>IPC Project — تقرير تنفيذي</div>
               <div style={{fontSize:12,opacity:0.65,marginTop:3}}>{new Date().toLocaleDateString("ar-EG")} · PM: Eng. Ahmed Aboelhasan</div>
             </div>
             <div style={{background:C.navy,padding:"12px 24px",display:"flex",alignItems:"center",gap:14}}>
-              <div style={{flex:1}}><div style={{color:"rgba(255,255,255,0.6)",fontSize:11,marginBottom:4}}>التقدم الكلي الفعلي</div><ProgressBar pct={overall} height={14}/></div>
+              <div style={{flex:1}}><div style={{color:"rgba(255,255,255,0.6)",fontSize:11,marginBottom:4}}>التقدم الكلي</div><ProgressBar pct={overall} height={14}/></div>
               <div style={{color:C.white,fontWeight:900,fontSize:30}}>{overall}%</div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",background:C.white,borderBottom:`1px solid ${C.grayLight}`}}>
@@ -744,7 +974,7 @@ export default function App() {
                         <tr key={task.id} style={{background:i%2===0?C.white:C.offwhite}}>
                           <td style={{padding:"7px 12px",color:C.navy,fontWeight:600}}>{task.title}</td>
                           <td style={{padding:"7px 12px",color:C.gray}}>{task.owner}</td>
-                          <td style={{padding:"7px 12px",color:C.gray}}>{task.due || "TBD"}</td>
+                          <td style={{padding:"7px 12px",color:C.gray}}>{task.due}</td>
                           <td style={{padding:"7px 12px",textAlign:"center"}}>
                             <span style={{fontSize:11,fontWeight:700,color:C.blueMid,background:C.blueLight,padding:"1px 7px",borderRadius:99}}>{task.weight}%</span>
                           </td>
@@ -756,7 +986,7 @@ export default function App() {
                   <div style={{padding:"7px 20px 10px",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
                     {Object.entries(STATUS_CONFIG).map(([s,cfg])=>{
                       const cnt=pillar.tasks.filter(t=>t.status===s).length;
-                      return cnt>0 ? <span key={s} style={{fontSize:11,color:cfg.color,background:cfg.bg,padding:"2px 8px",borderRadius:99}}>{cfg.label} {cnt}</span> : null;
+                      return cnt>0?<span key={s} style={{fontSize:11,color:cfg.color,background:cfg.bg,padding:"2px 8px",borderRadius:99}}>{cfg.label} {cnt}</span>:null;
                     })}
                     <WeightWarning tasks={pillar.tasks}/>
                   </div>
