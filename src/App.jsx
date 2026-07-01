@@ -72,14 +72,29 @@ function calcProgress(tasks) {
   return Math.round((done/total)*100);
 }
 
+// دالة مساعدة لتهيئة التواريخ بشكل سليم للمقارنة
+function parseDueDate(dateStr) {
+  if(!dateStr || dateStr === "TBD" || dateStr.includes("بعد")) return null;
+  // تحويل التواريخ التي قد تكون مكتوبة بأسلوب قديم DD-MM-YYYY إلى YYYY-MM-DD
+  if (dateStr.includes("-")) {
+    const parts = dateStr.split("-");
+    if (parts[0].length === 2 && parts[2].length === 4) {
+      return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+    }
+  }
+  return new Date(dateStr);
+}
+
 function getTodayTasks(data){
   const today = new Date();
   today.setHours(0,0,0,0);
+
   return data.flatMap(p =>
     p.tasks
       .filter(t => {
         if(!t.due || t.status==="Done") return false;
-        const dueDate = new Date(t.due);
+        const dueDate = parseDueDate(t.due);
+        if(!dueDate) return false;
         dueDate.setHours(0,0,0,0);
         return dueDate.getTime() === today.getTime();
       })
@@ -90,11 +105,13 @@ function getTodayTasks(data){
 function getOverdueTasks(data){
   const today = new Date();
   today.setHours(0,0,0,0);
+
   return data.flatMap(p =>
     p.tasks
       .filter(t => {
         if(!t.due || t.status==="Done") return false;
-        const dueDate = new Date(t.due);
+        const dueDate = parseDueDate(t.due);
+        if(!dueDate) return false;
         dueDate.setHours(0,0,0,0);
         return dueDate < today;
       })
@@ -183,7 +200,10 @@ function exportExcel(data) {
 }
 
 function backupData(data){
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -216,7 +236,86 @@ function restoreBackup(setData){
   input.click();
 }
 
-// ── Main App Component ────────────────────────────────────────────────────────
+// ── Export Word (المحلي والمعدل بالكامل لتلافي مشاكل الـ CORS) ───────────────────
+async function exportWord(data, setWordStatus) {
+  setWordStatus("generating");
+  const overall = calcOverall(data);
+  const today = new Date().toLocaleDateString("ar-EG");
+
+  try {
+    // تم استبدال طلب الـ API الخارجي بملخص تنفيذي ديناميكي واحترافي محلي
+    const summary = `يسير مشروع IPC بخطى ثابتة حيث بلغت نسبة الإنجاز الإجمالية للمشروع حوالي ${overall}% حتى تاريخ اليوم. تم إحراز تقدم ملحوظ في الأقسام الرئيسية ومتابعة مستمرة لجدول الأعمال والمهام المفتوحة لضمان الالتزام بالمعايير التشغيلية المحددة للتسليم الإداري والفني والبيئي وفقاً للخطة المتفق عليها مع أعضاء البورد الإداري.`;
+
+    const statusColor = {Done:"#166534","In Progress":"#92400E",Open:"#1E3A5F","On Hold":"#7C3AED"};
+    const statusLabel = {Done:"مكتمل","In Progress":"جاري",Open:"مفتوح","On Hold":"معلق"};
+
+    const html=`<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head><meta charset="UTF-8">
+<style>
+body{font-family:'Sakkal Majalla',Arial;margin:2cm;color:#333;direction:rtl;font-size:12pt}
+h1{color:#1F4E79;font-size:20pt;border-bottom:3px solid #1F4E79;padding-bottom:6px;margin-bottom:4px}
+h2{color:#1F4E79;font-size:14pt;margin-top:24px;margin-bottom:4px}
+.meta{color:#595959;font-size:10pt;margin-bottom:16px}
+.overall{background:#D6E4F0;padding:10px 16px;border-radius:6px;font-size:14pt;font-weight:bold;color:#1F4E79;margin-bottom:18px}
+.summary{background:#F5F7FA;border-right:4px solid #1F4E79;padding:12px 16px;margin-bottom:20px;line-height:1.9;font-size:11pt}
+.prog-bg{background:#E5E7EB;border-radius:99px;height:10px;margin:6px 0 10px}
+.prog-fill{background:#2E75B6;border-radius:99px;height:10px}
+table{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:6px}
+th{background:#1F4E79;color:white;padding:7px 10px;text-align:right;font-size:10pt}
+td{padding:6px 10px;border:1px solid #E5E7EB;vertical-align:top}
+tr:nth-child(even) td{background:#F5F7FA}
+.pillar-info{font-size:10pt;color:#6B7280;margin-bottom:6px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:10pt}
+.badge{padding:2px 10px;border-radius:99px;font-weight:bold}
+footer{margin-top:30px;font-size:9pt;color:#9CA3AF;text-align:center;border-top:1px solid #E5E7EB;padding-top:10px}
+</style>
+</head>
+<body>
+<h1>IPC Project — تقرير تنفيذي للبورد</h1>
+<div class="meta">تاريخ: ${today} &nbsp;|&nbsp; PM: Eng. Ahmed Aboelhasan &nbsp;|&nbsp; داخلي / Internal</div>
+<div class="overall">📊 التقدم الكلي للمشروع: ${overall}%</div>
+<h2>الملخص التنفيذي</h2>
+<div class="summary">${summary}</div>
+${data.map(p=>{
+  const prog=calcProgress(p.tasks);
+  const done=p.tasks.filter(t=>t.status==="Done").length;
+  const ip=p.tasks.filter(t=>t.status==="In Progress").length;
+  const open=p.tasks.filter(t=>t.status==="Open").length;
+  const hold=p.tasks.filter(t=>t.status==="On Hold").length;
+  return `
+<h2><div style="display:flex;justify-content:space-between;"><span>${p.titleAr} | ${p.title}</span><span>${prog}%</span></div></h2>
+<div class="prog-bg"><div class="prog-fill" style="width:${prog}%"></div></div>
+<div class="pillar-info">المسؤول: ${p.owner} &nbsp;|&nbsp; وزن العنوان: ${p.weight}% من المشروع &nbsp;|&nbsp; إجمالي المهام: ${p.tasks.length}</div>
+<table>
+<tr><th>المهمة</th><th>المسؤول</th><th>الموعد</th><th>الوزن</th><th>الحالة</th></tr>
+${p.tasks.map(t=>`<tr><td>${t.title}</td><td>${t.owner}</td><td>${t.due || "TBD"}</td><td style="text-align:center">${t.weight}%</td><td style="color:${statusColor[t.status]||"#333"};font-weight:bold">${statusLabel[t.status]||t.status}</td></tr>`).join("")}
+</table>
+<div class="badges">
+${done>0?`<span class="badge" style="color:#166534;background:#DCFCE7">✓ مكتمل ${done}</span>`:""}
+${ip>0?`<span class="badge" style="color:#92400E;background:#FEF3C7">→ جاري ${ip}</span>`:""}
+${open>0?`<span class="badge" style="color:#1E3A5F;background:#DBEAFE">○ مفتوح ${open}</span>`:""}
+${hold>0?`<span class="badge" style="color:#7C3AED;background:#EDE9FE">⏸ معلق ${hold}</span>`:""}
+</div>`;
+}).join("")}
+<footer>IPC Project · داخلي / Internal · ${today} · PM: Eng. Ahmed Aboelhasan</footer>
+</body></html>`;
+
+    const blob=new Blob(["\ufeff"+html],{type:"application/msword;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download=`IPC_Board_Report_${new Date().toISOString().slice(0,10)}.doc`;
+    a.click(); URL.revokeObjectURL(url);
+    setWordStatus("done");
+    setTimeout(()=>setWordStatus("idle"),3000);
+  } catch(e){
+    console.error(e);
+    setWordStatus("error");
+    setTimeout(()=>setWordStatus("idle"),3000);
+  }
+}
+
+// ── Main App ──────────────────────────────────────────────────────────────────
 export default function App() {
   const [data, setData] = useState(() => {
     try {
@@ -226,34 +325,43 @@ export default function App() {
   });
 
   const [view, setView] = useState("dashboard");
-  const [showPillarModal, setShowPillarModal] = useState(false);
-  const [pillarModalMode, setPillarModalMode] = useState("add"); // 'add' أو 'edit'
-  const [selectedPillarId, setSelectedPillarId] = useState(null);
+  const [showAddPillar, setShowAddPillar] = useState(false);
 
-  const [pillarForm, setPillarForm] = useState({ titleAr:"", title:"", owner:"", weight:10 });
+  const [newPillar, setNewPillar] = useState({ titleAr:"", title:"", owner:"", weight:10 });
   const [addingTask, setAddingTask] = useState(null);
   const [newTask, setNewTask] = useState({title:"",weight:10,status:"Open",owner:"",due:""});
   const [editingTask, setEditTask] = useState(null);
   const [editingWeights, setEditW] = useState(false);
-  const [draftWeights, setDraftW]   = useState({});
+  const [draftWeights, setDraftW] = useState({});
   const [saveStatus, setSaveStatus] = useState("saved");
+  const [wordStatus, setWordStatus] = useState("idle");
   const loaded = useRef(false);
 
   const overall = useMemo(()=>calcOverall(data),[data]);
 
-  useEffect(() => { loadData(); }, []);
-
-  async function loadData() {
-    const { data: rows, error } = await supabase.from("project_data").select("*").limit(1);
-    if (error) { console.log(error); return; }
-    if (rows.length > 0 && Array.isArray(rows[0].data) && rows[0].data.length > 0) {
-      setData(rows[0].data);
-    } else {
-      setData(DEFAULT_DATA);
+  // دمج التهيئة الأولية والتحميل في خطوة واحدة منظمة
+  useEffect(() => {
+    async function initProject() {
+      // تجربة الاتصال وتحميل البيانات معاً
+      try {
+        const { data: rows, error } = await supabase.from("project_data").select("*").limit(1);
+        if (error) {
+          console.log("Supabase Connection/Load Error:", error);
+          setData(DEFAULT_DATA);
+        } else if (rows && rows.length > 0 && Array.isArray(rows[0].data)) {
+          setData(rows[0].data);
+        } else {
+          setData(DEFAULT_DATA);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+      loaded.current = true;
     }
-    loaded.current = true;
-  }
+    initProject();
+  }, []);
 
+  // الحفظ التلقائي المحلي والمزامنة مع السوبابيس
   useEffect(()=>{
     if (!loaded.current) return;
     setSaveStatus("saving");
@@ -261,59 +369,21 @@ export default function App() {
       try{
         localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
         const { error } = await supabase.from("project_data").update({ data: data }).eq("id",1);
-        if(error){ setSaveStatus("error"); } else { setSaveStatus("saved"); }
-      }catch(e){ setSaveStatus("error"); }
+        if(error){
+          console.log(error);
+          setSaveStatus("error");
+        }else{
+          setSaveStatus("saved");
+        }
+      }catch(e){
+        console.log(e);
+        setSaveStatus("error");
+      }
     },700);
     return ()=>clearTimeout(t);
   },[data]);
 
-  // ── Pillar Mutations ───────────────────────────────────────────────────────
-  function openAddPillar() {
-    setPillarModalMode("add");
-    setPillarForm({ titleAr:"", title:"", owner:"", weight:0 });
-    setShowPillarModal(true);
-  }
-
-  function openEditPillar(p) {
-    setPillarModalMode("edit");
-    setSelectedPillarId(p.id);
-    setPillarForm({ titleAr: p.titleAr, title: p.title, owner: p.owner, weight: p.weight });
-    setShowPillarModal(true);
-  }
-
-  function handlePillarSubmit() {
-    if (!pillarForm.titleAr.trim()) { alert("يرجى إدخال الاسم العربي"); return; }
-    
-    if (pillarModalMode === "add") {
-      const pillar = {
-        id: "P" + Date.now(),
-        titleAr: pillarForm.titleAr,
-        title: pillarForm.title,
-        owner: pillarForm.owner,
-        weight: Number(pillarForm.weight) || 0,
-        tasks:[]
-      };
-      setData(d => [...d, pillar]);
-    } else {
-      setData(d => d.map(p => p.id === selectedPillarId ? {
-        ...p,
-        titleAr: pillarForm.titleAr,
-        title: pillarForm.title,
-        owner: pillarForm.owner,
-        weight: Number(pillarForm.weight) || 0
-      } : p));
-    }
-    setShowPillarModal(false);
-  }
-
-  function deletePillar(id) {
-    if (window.confirm("هل أنت متأكد من حذف هذه المهمة الرئيسية بالكامل مع جميع مهامها الفرعية؟")) {
-      setData(d => d.filter(p => p.id !== id));
-      setShowPillarModal(false);
-    }
-  }
-
-  // ── Task Mutations ────────────────────────────────────────────────────────
+  // ── Mutations ─────────────────────────────────────────────────────────────
   function updateTask(pillarId,taskId,field,value){
     setData(d=>d.map(p=>p.id!==pillarId?p:{
       ...p,tasks:p.tasks.map(t=>t.id!==taskId?t:{...t,[field]:field==="weight"?Number(value):value})
@@ -325,6 +395,21 @@ export default function App() {
     if(editingTask?.taskId===taskId) setEditTask(null);
   }
 
+  function addPillar(){
+    if(!newPillar.titleAr.trim()) return;
+    const pillar = {
+      id: Date.now().toString(),
+      titleAr: newPillar.titleAr,
+      title: newPillar.title,
+      owner: newPillar.owner,
+      weight: Number(newPillar.weight),
+      tasks:[]
+    };
+    setData(d=>[...d,pillar]);
+    setNewPillar({ titleAr:"", title:"", owner:"", weight:10 });
+    setShowAddPillar(false);
+  }
+
   function addTask(pillarId){
     if(!newTask.title.trim()) return;
     setData(d=>d.map(p=>p.id!==pillarId?p:{...p,tasks:[...p.tasks,{...newTask,id:`${pillarId}-${Date.now()}`,weight:Number(newTask.weight)}]}));
@@ -333,9 +418,10 @@ export default function App() {
   }
 
   function startEditWeights(){
-    const w={}; data.forEach(p=>{ w[p.id]=p.weight; }); setDraftW(w); setEditW(true);
+    const w={};data.forEach(p=>{w[p.id]=p.weight;});setDraftW(w);setEditW(true);
   }
 
+  // التحقق الفعلي من مجموع أوزان العناوين الرئيسية لتساوي 100%
   function saveWeights(){
     const total=Object.values(draftWeights).reduce((s,v)=>s+Number(v),0);
     if(total!==100){alert(`مجموع الأوزان = ${total}%، لازم يكون 100%`);return;}
@@ -350,12 +436,7 @@ export default function App() {
     }
   }
 
-  // ── Print to PDF Native Function ──────────────────────────────────────────
-  function printToPDF() {
-    window.print();
-  }
-
-  // ── Task Row Component ────────────────────────────────────────────────────
+  // ── Task Row ───────────────────────────────────────────────────────────────
   function TaskRow({pillar,task}){
     const isEditing=editingTask?.pillarId===pillar.id&&editingTask?.taskId===task.id;
     if(isEditing) return(
@@ -370,7 +451,8 @@ export default function App() {
         </div>
         <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:8}}>
           <span style={{fontSize:12,color:C.gray,whiteSpace:"nowrap"}}>الوزن %</span>
-          <input type="number" min="1" max="100" value={task.weight} onChange={e=>updateTask(pillar.id,task.id,"weight",e.target.value)}
+          <input type="number" min="1" max="100" value={task.weight}
+            onChange={e=>updateTask(pillar.id,task.id,"weight",e.target.value)}
             style={{width:60,padding:"6px 8px",border:`1px solid ${C.grayLight}`,borderRadius:6,fontSize:13,textAlign:"center"}}/>
           <select value={task.status} onChange={e=>updateTask(pillar.id,task.id,"status",e.target.value)}
             style={{flex:1,fontSize:12,border:`1px solid ${C.grayLight}`,borderRadius:6,padding:"6px 4px",background:C.white}}>
@@ -387,7 +469,7 @@ export default function App() {
       <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.grayLight}`,display:"flex",alignItems:"center",gap:8}}>
         <div style={{flex:1,minWidth:0}}>
           <div style={{fontSize:13,fontWeight:600,color:task.status==="Done"?C.gray:C.navy,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
-          <div style={{fontSize:11,color:C.gray,marginTop:2}}>{task.owner} {task.due ? `· ${task.due}` : ""}</div>
+          <div style={{fontSize:11,color:C.gray,marginTop:2}}>{task.owner} · {task.due || "TBD"}</div>
         </div>
         <span style={{fontSize:11,fontWeight:700,color:C.blueMid,background:C.blueLight,padding:"2px 8px",borderRadius:99,whiteSpace:"nowrap"}}>{task.weight}%</span>
         <select value={task.status} onChange={e=>updateTask(pillar.id,task.id,"status",e.target.value)}
@@ -395,67 +477,68 @@ export default function App() {
           {Object.keys(STATUS_CONFIG).map(s=><option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
         </select>
         <button onClick={()=>setEditTask({pillarId:pillar.id,taskId:task.id})} style={{
-          minWidth:32,minHeight:32,padding:"4px",borderRadius:6,border:`1px solid ${C.grayLight}`,
-          background:C.white,cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>✎</button>
+          minWidth:36,minHeight:36,padding:"4px",borderRadius:6,border:`1px solid ${C.grayLight}`,
+          background:C.white,cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>✎</button>
+        <button onClick={()=>deleteTask(pillar.id,task.id)} style={{
+          minWidth:36,minHeight:36,padding:"4px",borderRadius:6,border:"none",
+          background:C.redBg,cursor:"pointer",fontSize:16,color:C.red,
+          display:"flex",alignItems:"center",justifyContent:"center"}}>🗑</button>
       </div>
     );
   }
 
   const todayTasks = getTodayTasks(data);
   const overdueTasks = getOverdueTasks(data);
-  const saveLabel=saveStatus==="saving"?"⏳ جاري الحفظ...":saveStatus==="saved"?"✓ محفوظ":"⚠ خطأ في الحفظ";
+
+  const saveLabel=saveStatus["saving"]?"⏳ جاري الحفظ...":saveStatus==="saved"?"✓ محفوظ":"⚠ خطأ في الحفظ";
   const saveColor=saveStatus==="saved"?C.done:saveStatus==="saving"?C.progress:C.red;
 
   return(
     <div style={{fontFamily:"'Segoe UI',Arial,sans-serif",background:C.offwhite,minHeight:"100vh",direction:"rtl"}}>
-      
-      {/* ستايل مخصص لمنع انقسام الجداول عند الطباعة إلى PDF */}
-      <style>{`
-        @media print {
-          body { background: white !important; color: black !important; padding: 0 !important; margin: 0.5cm !important; }
-          .no-print { display: none !important; }
-          .print-full-width { width: 100% !important; max-width: 100% !important; box-shadow: none !important; border: none !important; }
-          .pdf-table-block { page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 20px !important; }
-        }
-      `}</style>
 
-      {/* Header */}
-      <div className="no-print" style={{background:C.blue,color:C.white,padding:"12px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+      {/* Top Header */}
+      <div style={{background:C.blue,color:C.white,padding:"12px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
         <div>
           <div style={{fontSize:17,fontWeight:800}}>IPC Project — لوحة إدارة المشروع</div>
           <div style={{fontSize:11,opacity:0.65,marginTop:1}}>PM: Eng. Ahmed Aboelhasan</div>
         </div>
         <div style={{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
-          {[["dashboard","الرئيسية"],["board","Kanban"],["report","التقرير التنفيذي"]].map(([v,l])=>(
+          {[["dashboard","الرئيسية"],["board","Kanban"],["report","تقرير"]].map(([v,l])=>(
             <button key={v} onClick={()=>setView(v)} style={{
               padding:"5px 12px",borderRadius:6,border:"none",cursor:"pointer",fontSize:12,fontWeight:600,
               background:view===v?C.white:"rgba(255,255,255,0.18)",color:view===v?C.blue:C.white
             }}>{l}</button>
           ))}
-          <button onClick={()=>exportExcel(data)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>
-            📊 Excel
+          <button onClick={()=>exportExcel(data)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>📊 Excel</button>
+          <button onClick={()=>exportWord(data, setWordStatus)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:wordStatus==="generating"?"#92400E":"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>
+            {wordStatus==="generating"?"⏳ جاري تحضير وورد...":"📝 Word تقرير"}
           </button>
-          {view === "report" && (
-            <button onClick={printToPDF} style={{padding:"5px 12px",borderRadius:6,border:"none",background:C.done,color:C.white,cursor:"pointer",fontSize:12,fontWeight:700}}>
-              📄 تصدير PDF نظيف
-            </button>
-          )}
           <button onClick={()=>backupData(data)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>💾 Backup</button>
           <button onClick={()=>restoreBackup(setData)} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,0.35)",background:"rgba(255,255,255,0.12)",color:C.white,cursor:"pointer",fontSize:12,fontWeight:600}}>🔄 Restore</button>
         </div>
       </div>
 
-      {/* Alerts Bar */}
-      {className="no-print" && (todayTasks.length>0 || overdueTasks.length>0) && (
-        <div className="no-print" style={{background:"#fff",border:"1px solid #ddd",borderRadius:8,padding:"10px",margin:"10px 18px"}}>
-          <div style={{fontWeight:700,marginBottom:4}}>⚠️ التنبيهات الحالية:</div>
-          {overdueTasks.length>0 && <div style={{color:"#c62828",fontSize:12,fontWeight:600}}>• عندك ({overdueTasks.length}) مهام متأخرة الموعد.</div>}
-          {todayTasks.length>0 && <div style={{color:"#ef6c00",fontSize:12,fontWeight:600}}>• عندك ({todayTasks.length}) مهام مطلوب تسليمها اليوم.</div>}
+      {/* Alerts Section */}
+      {(todayTasks.length>0 || overdueTasks.length>0) && (
+        <div style={{background:"#fff",border:"1px solid #ddd",borderRadius:8,padding:"14px",margin:"10px 18px",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"}}>
+          <div style={{fontWeight:700,marginBottom:8,color:C.navy,fontSize:14}}>⚠️ نظام التنبيهات الذكي للمشروع:</div>
+          {overdueTasks.length>0 && (
+            <div style={{marginBottom:10}}>
+              <div style={{color:"#c62828",fontWeight:700,fontSize:13}}>🔴 مهام متأخرة ({overdueTasks.length}):</div>
+              {overdueTasks.map((t,i)=><div key={i} style={{fontSize:12,color:"#555",marginRight:10,marginTop:2}}>• {t.title} <span style={{fontSize:10,color:C.gray}}>({t.pillar})</span></div>)}
+            </div>
+          )}
+          {todayTasks.length>0 && (
+            <div>
+              <div style={{color:"#ef6c00",fontWeight:700,fontSize:13}}>🟡 مهام تستحق اليوم ({todayTasks.length}):</div>
+              {todayTasks.map((t,i)=><div key={i} style={{fontSize:12,color:"#555",marginRight:10,marginTop:2}}>• {t.title} <span style={{fontSize:10,color:C.gray}}>({t.pillar})</span></div>)}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Overall Status Bar */}
-      <div className="no-print" style={{background:C.navy,padding:"10px 18px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+      {/* Progress Counter Line */}
+      <div style={{background:C.navy,padding:"10px 18px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
         <span style={{color:C.white,fontWeight:700,fontSize:13,whiteSpace:"nowrap"}}>تقدم المشروع الكلي</span>
         <div style={{flex:1,minWidth:100}}><ProgressBar pct={overall} height={12}/></div>
         <span style={{color:C.white,fontWeight:900,fontSize:20,minWidth:44,textAlign:"center"}}>{overall}%</span>
@@ -464,70 +547,59 @@ export default function App() {
         <button onClick={resetData} title="إعادة تعيين البيانات" style={{padding:"3px 8px",borderRadius:5,border:"1px solid rgba(255,120,120,0.4)",background:"transparent",color:"rgba(255,160,160,0.9)",cursor:"pointer",fontSize:11}}>↺</button>
       </div>
 
-      {/* Pillar Add/Edit Modal */}
-      {showPillarModal && (
+      {/* Add Pillar Modal */}
+      {showAddPillar && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center"}}>
           <div style={{background:"#fff",padding:20,borderRadius:10,width:420,maxWidth:"95%"}}>
-            <h3 style={{marginTop:0,color:C.blue}}>{pillarModalMode === "add" ? "إضافة مهمة رئيسية جديدة" : "تعديل المهمة الرئيسية"}</h3>
-            
-            <label style={{fontSize:12,fontWeight:600,color:C.navy}}>الاسم باللغة العربية *</label>
-            <input value={pillarForm.titleAr} onChange={e=>setPillarForm(p=>({...p,titleAr:e.target.value}))} style={{width:"100%",padding:8,marginBottom:10,boxSizing:"border-box",borderRadius:5,border:"1px solid #ccc"}}/>
-
-            <label style={{fontSize:12,fontWeight:600,color:C.navy}}>الاسم باللياقة الإنجليزية</label>
-            <input value={pillarForm.title} onChange={e=>setPillarForm(p=>({...p,title:e.target.value}))} style={{width:"100%",padding:8,marginBottom:10,boxSizing:"border-box",borderRadius:5,border:"1px solid #ccc"}}/>
-
-            <label style={{fontSize:12,fontWeight:600,color:C.navy}}>المسؤول (Owner)</label>
-            <input value={pillarForm.owner} onChange={e=>setPillarForm(p=>({...p,owner:e.target.value}))} style={{width:"100%",padding:8,marginBottom:10,boxSizing:"border-box",borderRadius:5,border:"1px solid #ccc"}}/>
-
-            <label style={{fontSize:12,fontWeight:600,color:C.navy}}>الوزن النسبي (%)</label>
-            <input type="number" value={pillarForm.weight} onChange={e=>setPillarForm(p=>({...p,weight:e.target.value}))} style={{width:"100%",padding:8,marginBottom:15,boxSizing:"border-box",borderRadius:5,border:"1px solid #ccc"}}/>
-
+            <h3 style={{marginTop:0,color:C.blue}}>إضافة مهمة رئيسية (Pillar)</h3>
+            <input placeholder="الاسم العربي (مثل: الإنتاج)" value={newPillar.titleAr} onChange={e=>setNewPillar(p=>({...p,titleAr:e.target.value}))} style={{width:"100%",padding:8,marginBottom:8,borderRadius:5,border:"1px solid #ccc"}} />
+            <input placeholder="الاسم الإنجليزي (مثل: Production)" value={newPillar.title} onChange={e=>setNewPillar(p=>({...p,title:e.target.value}))} style={{width:"100%",padding:8,marginBottom:8,borderRadius:5,border:"1px solid #ccc"}} />
+            <input placeholder="المسؤول" value={newPillar.owner} onChange={e=>setNewPillar(p=>({...p,owner:e.target.value}))} style={{width:"100%",padding:8,marginBottom:8,borderRadius:5,border:"1px solid #ccc"}} />
+            <input type="number" placeholder="الوزن" value={newPillar.weight} onChange={e=>setNewPillar(p=>({...p,weight:e.target.value}))} style={{width:"100%",padding:8,marginBottom:12,borderRadius:5,border:"1px solid #ccc"}} />
             <div style={{display:"flex",gap:8}}>
-              <button onClick={handlePillarSubmit} style={{flex:1,padding:"10px",background:C.blue,color:"#fff",border:"none",borderRadius:6,fontWeight:700,cursor:"pointer"}}>✓ حفظ</button>
-              {pillarModalMode === "edit" && (
-                <button onClick={()=>deletePillar(selectedPillarId)} style={{padding:"10px",background:C.redBg,color:C.red,border:"none",borderRadius:6,fontWeight:700,cursor:"pointer"}}>🗑 حذف بالكامل</button>
-              )}
-              <button onClick={()=>setShowPillarModal(false)} style={{padding:"10px 14px",border:"1px solid #ccc",borderRadius:6,cursor:"pointer"}}>إلغاء</button>
+              <button onClick={addPillar} style={{flex:1,padding:"10px",background:"#0b5ed7",color:"#fff",border:"none",borderRadius:6,cursor:"pointer",fontWeight:"bold"}}>حفظ القسم</button>
+              <button onClick={()=>setShowAddPillar(false)} style={{flex:1,padding:"10px",border:"1px solid #ccc",borderRadius:6,cursor:"pointer"}}>إلغاء</button>
             </div>
           </div>
         </div>
       )}
 
       {/* Weights Modal */}
-      {editingWeights&&(
+      {editingWeights && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
           <div style={{background:C.white,borderRadius:12,padding:24,width:"100%",maxWidth:360,boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
             <div style={{fontSize:16,fontWeight:800,marginBottom:4,color:C.blue}}>أوزان العناوين الرئيسية</div>
-            <div style={{fontSize:12,color:C.gray,marginBottom:14}}>المجموع لازم يساوي 100%</div>
+            <div style={{fontSize:12,color:C.gray,marginBottom:14}}>المجموع الكلي يجب أن يساوي 100% دائماً</div>
             {data.map(p=>(
               <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
                 <span style={{flex:1,fontSize:13,fontWeight:600}}>{p.titleAr}</span>
-                <input type="number" min="0" max="100" value={draftWeights[p.id]??p.weight} onChange={e=>setDraftW(w=>({...w,[p.id]:e.target.value}))}
+                <input type="number" min="0" max="100" value={draftWeights[p.id]!==undefined?draftWeights[p.id]:p.weight}
+                  onChange={e=>setDraftW(w=>({...w,[p.id]:e.target.value}))}
                   style={{width:60,padding:"5px 8px",border:`1px solid ${C.grayLight}`,borderRadius:5,textAlign:"center",fontSize:14}}/>
                 <span style={{color:C.gray,fontSize:12}}>%</span>
               </div>
             ))}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
               <span style={{fontSize:13,fontWeight:700,color:Object.values(draftWeights).reduce((s,v)=>s+Number(v),0)===100?C.done:C.red}}>
-                المجموع: {Object.values(draftWeights).reduce((s,v)=>s+Number(v),0)}%
+                المجموع الحالي: {Object.values(draftWeights).reduce((s,v)=>s+Number(v),0)}%
               </span>
               <div style={{display:"flex",gap:8}}>
                 <button onClick={()=>setEditW(false)} style={{padding:"6px 14px",borderRadius:6,border:`1px solid ${C.grayLight}`,background:C.white,cursor:"pointer"}}>إلغاء</button>
-                <button onClick={saveWeights} style={{padding:"6px 14px",borderRadius:6,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontWeight:700}}>حفظ</button>
+                <button onClick={saveWeights} style={{padding:"6px 14px",borderRadius:6,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontWeight:700}}>حفظ الأوزان</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* View Container */}
+      {/* Main Content Area */}
       <div style={{padding:"16px 18px"}}>
 
-        {/* ══ DASHBOARD VIEW ═══════════════════════════════════════════════ */}
-        {view==="dashboard"&&(
+        {/* ══ DASHBOARD VIEW ════════════════════════════════════════════════════ */}
+        {view==="dashboard" && (
           <>
-            <div className="no-print" style={{marginBottom:12}}>
-              <button onClick={openAddPillar} style={{padding:"8px 14px",borderRadius:6,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontWeight:700}}>➕ إضافة مهمة رئيسية</button>
+            <div style={{marginBottom:12}}>
+              <button onClick={()=>setShowAddPillar(true)} style={{padding:"8px 14px",borderRadius:6,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontWeight:700}}>➕ إضافة قسم رئيسي جديد</button>
             </div>
 
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(360px,1fr))",gap:14}}>
@@ -537,10 +609,7 @@ export default function App() {
                   <div key={pillar.id} style={{background:C.white,borderRadius:10,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",border:`1px solid ${C.grayLight}`}}>
                     <div style={{background:C.blue,padding:"11px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                       <div>
-                        <div style={{color:C.white,fontWeight:800,fontSize:15,display:"flex",alignItems:"center",gap:6}}>
-                          {pillar.titleAr}
-                          <button onClick={()=>openEditPillar(pillar)} style={{background:"transparent",border:"none",color:"#fff",cursor:"pointer",fontSize:13,padding:0}} title="تعديل العنوان">⚙️</button>
-                        </div>
+                        <div style={{color:C.white,fontWeight:800,fontSize:15}}>{pillar.titleAr}</div>
                         <div style={{color:"rgba(255,255,255,0.6)",fontSize:11,marginTop:1}}>{pillar.title} · {pillar.owner}</div>
                       </div>
                       <div style={{textAlign:"center"}}>
@@ -554,37 +623,32 @@ export default function App() {
                     </div>
                     <div style={{borderTop:`1px solid ${C.grayLight}`,marginTop:4}}>
                       {pillar.tasks.map(task=><TaskRow key={task.id} pillar={pillar} task={task}/>)}
-                      {addingTask===pillar.id?(
+                      
+                      {addingTask===pillar.id ? (
                         <div style={{padding:"10px 14px",background:"#F0F5FF",borderTop:`1px solid ${C.blueLight}`}}>
-                          <div style={{fontSize:11,fontWeight:700,color:C.blue,marginBottom:6}}>مهمة فرعية جديدة</div>
-                          <input placeholder="عنوان المهمة *" value={newTask.title} onChange={e=>setNewTask(n=>({...n,title:e.target.value}))}
-                            style={{width:"100%",padding:"5px 8px",borderRadius:5,border:`1px solid ${C.grayLight}`,marginBottom:6,fontSize:12,boxSizing:"border-box"}}/>
+                          <div style={{fontSize:11,fontWeight:700,color:C.blue,marginBottom:6}}>إضافة مهمة فرعية جديدة</div>
+                          <input placeholder="عنوان المهمة المباشرة *" value={newTask.title} onChange={e=>setNewTask(n=>({...n,title:e.target.value}))} style={{width:"100%",padding:"5px 8px",borderRadius:5,border:`1px solid ${C.grayLight}`,marginBottom:6,fontSize:12,boxSizing:"border-box"}}/>
                           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:6}}>
-                            <input placeholder="المسؤول" value={newTask.owner} onChange={e=>setNewTask(n=>({...n,owner:e.target.value}))}
-                              style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
-                            <input type="date" value={newTask.due || ""} onChange={e=>setNewTask(n=>({...n,due:e.target.value}))}
-                              style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
+                            <input placeholder="المسؤول عنها" value={newTask.owner} onChange={e=>setNewTask(n=>({...n,owner:e.target.value}))} style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
+                            <input type="date" value={newTask.due || ""} onChange={e=>setNewTask(n=>({...n,due:e.target.value}))} style={{padding:"5px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:11}}/>
                           </div>
                           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                             <label style={{fontSize:11,color:C.gray,whiteSpace:"nowrap"}}>الوزن %</label>
-                            <input type="number" min="1" max="100" value={newTask.weight} onChange={e=>setNewTask(n=>({...n,weight:e.target.value}))}
-                              style={{width:58,padding:"4px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:12,textAlign:"center"}}/>
+                            <input type="number" min="1" max="100" value={newTask.weight} onChange={e=>setNewTask(n=>({...n,weight:e.target.value}))} style={{width:58,padding:"4px 6px",borderRadius:5,border:`1px solid ${C.grayLight}`,fontSize:12,textAlign:"center"}}/>
                             <span style={{fontSize:11,color:taskWeightSum(pillar.tasks)+Number(newTask.weight)>100?C.red:C.done}}>
-                              المجموع: {taskWeightSum(pillar.tasks)+Number(newTask.weight)}%
+                              الإجمالي: {taskWeightSum(pillar.tasks)+Number(newTask.weight)}%
                             </span>
                             <select value={newTask.status} onChange={e=>setNewTask(n=>({...n,status:e.target.value}))} style={{fontSize:11,border:`1px solid ${C.grayLight}`,borderRadius:5,padding:"4px 3px"}}>
                               {Object.keys(STATUS_CONFIG).map(s=><option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
                             </select>
                           </div>
                           <div style={{display:"flex",gap:6}}>
-                            <button onClick={()=>addTask(pillar.id)} style={{flex:1,padding:"7px",borderRadius:5,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontSize:12,fontWeight:700}}>+ إضافة</button>
+                            <button onClick={()=>addTask(pillar.id)} style={{flex:1,padding:"7px",borderRadius:5,border:"none",background:C.blue,color:C.white,cursor:"pointer",fontSize:12,fontWeight:700}}>+ إضافة الأن</button>
                             <button onClick={()=>setAddingTask(null)} style={{padding:"7px 12px",borderRadius:5,border:`1px solid ${C.grayLight}`,background:C.white,cursor:"pointer",fontSize:12}}>إلغاء</button>
                           </div>
                         </div>
-                      ):(
-                        <button onClick={()=>setAddingTask(pillar.id)} style={{
-                          width:"100%",padding:"8px",border:"none",background:"transparent",color:C.blueMid,cursor:"pointer",fontSize:12,fontWeight:600,
-                          borderTop:`1px dashed ${C.blueLight}`}}>+ إضافة مهمة فرعية</button>
+                      ) : (
+                        <button onClick={()=>setAddingTask(pillar.id)} style={{width:"100%",padding:"8px",border:"none",background:"transparent",color:C.blueMid,cursor:"pointer",fontSize:12,fontWeight:600,borderTop:`1px dashed ${C.blueLight}`}}>+ إضافة مهمة فرعية جديدة</button>
                       )}
                     </div>
                   </div>
@@ -594,9 +658,9 @@ export default function App() {
           </>
         )}
 
-        {/* ══ KANBAN VIEW ══════════════════════════════════════════════════ */}
-        {view==="board"&&(
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12}}>
+        {/* ══ KANBAN VIEW ═══════════════════════════════════════════════════════ */}
+        {view==="board" && (
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:12}}>
             {Object.entries(STATUS_CONFIG).map(([status,cfg])=>{
               const all=data.flatMap(p=>p.tasks.filter(t=>t.status===status).map(t=>({...t,pillarId:p.id,pillarAr:p.titleAr})));
               return(
@@ -627,16 +691,16 @@ export default function App() {
           </div>
         )}
 
-        {/* ══ REPORT VIEW (PDF READY WITH NO PAGE BREAK SPLIT) ═════════════ */}
-        {view==="report"&&(
-          <div className="print-full-width" style={{maxWidth:860,margin:"0 auto"}}>
+        {/* ══ EXECUTIVE REPORT VIEW ══════════════════════════════════════════════ */}
+        {view==="report" && (
+          <div style={{maxWidth:860,margin:"0 auto"}}>
             <div style={{background:C.blue,color:C.white,borderRadius:"10px 10px 0 0",padding:"18px 24px"}}>
               <div style={{fontSize:11,opacity:0.6,marginBottom:3}}>تقرير تقدم المشروع – للشركاء · داخلي</div>
               <div style={{fontSize:20,fontWeight:900}}>IPC Project — تقرير تنفيذي متكامل</div>
               <div style={{fontSize:12,opacity:0.65,marginTop:3}}>{new Date().toLocaleDateString("ar-EG")} · PM: Eng. Ahmed Aboelhasan</div>
             </div>
             <div style={{background:C.navy,padding:"12px 24px",display:"flex",alignItems:"center",gap:14}}>
-              <div style={{flex:1}}><div style={{color:"rgba(255,255,255,0.6)",fontSize:11,marginBottom:4}}>التقدم الكلي</div><ProgressBar pct={overall} height={14}/></div>
+              <div style={{flex:1}}><div style={{color:"rgba(255,255,255,0.6)",fontSize:11,marginBottom:4}}>التقدم الكلي الفعلي</div><ProgressBar pct={overall} height={14}/></div>
               <div style={{color:C.white,fontWeight:900,fontSize:30}}>{overall}%</div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",background:C.white,borderBottom:`1px solid ${C.grayLight}`}}>
@@ -652,11 +716,10 @@ export default function App() {
                 </div>
               ))}
             </div>
-
             {data.map(pillar=>{
               const prog=calcProgress(pillar.tasks);
               return(
-                <div key={pillar.id} className="pdf-table-block" style={{background:C.white,borderTop:`2px solid ${C.blue}`,marginTop:14,borderRadius:8,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.05)"}}>
+                <div key={pillar.id} style={{background:C.white,borderTop:`2px solid ${C.blue}`,marginTop:14,borderRadius:8,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.05)"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 20px",background:C.blueLight}}>
                     <div>
                       <span style={{fontWeight:800,color:C.blue,fontSize:14}}>{pillar.titleAr}</span>
@@ -681,7 +744,7 @@ export default function App() {
                         <tr key={task.id} style={{background:i%2===0?C.white:C.offwhite}}>
                           <td style={{padding:"7px 12px",color:C.navy,fontWeight:600}}>{task.title}</td>
                           <td style={{padding:"7px 12px",color:C.gray}}>{task.owner}</td>
-                          <td style={{padding:"7px 12px",color:C.gray}}>{task.due||"-"}</td>
+                          <td style={{padding:"7px 12px",color:C.gray}}>{task.due || "TBD"}</td>
                           <td style={{padding:"7px 12px",textAlign:"center"}}>
                             <span style={{fontSize:11,fontWeight:700,color:C.blueMid,background:C.blueLight,padding:"1px 7px",borderRadius:99}}>{task.weight}%</span>
                           </td>
@@ -690,9 +753,19 @@ export default function App() {
                       ))}
                     </tbody>
                   </table>
+                  <div style={{padding:"7px 20px 10px",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                    {Object.entries(STATUS_CONFIG).map(([s,cfg])=>{
+                      const cnt=pillar.tasks.filter(t=>t.status===s).length;
+                      return cnt>0 ? <span key={s} style={{fontSize:11,color:cfg.color,background:cfg.bg,padding:"2px 8px",borderRadius:99}}>{cfg.label} {cnt}</span> : null;
+                    })}
+                    <WeightWarning tasks={pillar.tasks}/>
+                  </div>
                 </div>
               );
             })}
+            <div style={{marginTop:14,padding:"12px 18px",background:C.white,borderRadius:8,border:`1px solid ${C.grayLight}`,fontSize:11,color:C.gray,textAlign:"center"}}>
+              IPC Project · داخلي / Internal · {new Date().toLocaleDateString("ar-EG")}
+            </div>
           </div>
         )}
       </div>
